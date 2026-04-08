@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Use for migrations / introspection; Supabase pooler (6543) can hang on `migrate dev`
+  directUrl = env("DIRECT_URL")
+}
+
+enum TournamentType {
+  IPL
+}
+
+enum TournamentStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+}
+
+enum MatchStatus {
+  UPCOMING
+  LIVE
+  COMPLETED
+}
+
+model User {
+  id         String   @id @default(cuid())
+  supabaseId String   @unique
+  email      String   @unique
+  name       String?
+  avatarUrl  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tournamentsOwned Tournament[]       @relation("TournamentOwner")
+  memberships      TournamentMember[]
+  votes            Vote[]
+}
+
+model Tournament {
+  id        String           @id @default(cuid())
+  name      String
+  season    String
+  type      TournamentType   @default(IPL)
+  status    TournamentStatus @default(UPCOMING)
+  ownerId   String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  owner   User              @relation("TournamentOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members TournamentMember[]
+  matches  Match[]
+
+  @@index([ownerId])
+}
+
+model TournamentMember {
+  id           String   @id @default(cuid())
+  tournamentId String
+  userId       String
+  score        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tournamentId, userId])
+  @@index([userId])
+}
+
+model Match {
+  id           String      @id @default(cuid())
+  tournamentId String
+  iplMatchId   String?
+  matchDate    DateTime
+  venue        String?
+  team1        String
+  team2        String
+  /// RapidAPI schedule fields: schedule day, matchDesc, format, series, venue city/country, short team names
+  displayMeta  Json?
+  status       MatchStatus @default(UPCOMING)
+  winnerTeam   String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  votes      Vote[]
+
+  @@index([tournamentId, matchDate])
+  @@unique([tournamentId, iplMatchId])
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  matchId   String
+  userId    String
+  teamVoted String
+  createdAt DateTime @default(now())
+
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([matchId, userId])
+  @@index([userId])
+}
+

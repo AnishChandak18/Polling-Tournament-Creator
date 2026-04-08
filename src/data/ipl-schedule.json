@@ -1,0 +1,16 @@
+[
+  {
+    "id": "ipl-demo-1",
+    "matchDate": "2026-03-25T14:00:00.000Z",
+    "team1": "Chennai Super Kings",
+    "team2": "Mumbai Indians",
+    "venue": "MA Chidambaram Stadium"
+  },
+  {
+    "id": "ipl-demo-2",
+    "matchDate": "2026-03-26T14:00:00.000Z",
+    "team1": "Royal Challengers Bengaluru",
+    "team2": "Kolkata Knight Riders",
+    "venue": "M. Chinnaswamy Stadium"
+  }
+]

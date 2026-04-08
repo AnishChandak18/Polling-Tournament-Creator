@@ -1,0 +1,11 @@
+:root {
+  /* Legacy utility tokens used by older components only. */
+  --bg: #f5f7fa;
+  --text: #0d0d0d;
+}
+
+/* Dark mode (applied via <html class="dark">) */
+.dark {
+  --bg: #0d0d0d;
+  --text: #f5f7fa;
+}

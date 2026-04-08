@@ -1,0 +1,46 @@
+{
+  "name": "polling-tournament-creator",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "postinstall": "prisma generate",
+    "db:migrate": "dotenv -e .env.local -- prisma db push",
+    "db:deploy": "dotenv -e .env.local -- prisma migrate deploy",
+    "db:add-display-meta": "dotenv -e .env.local -- prisma db execute --schema prisma/schema.prisma --file prisma/migrations/20260331120000_add_match_display_meta/migration.sql",
+    "db:secure": "dotenv -e .env.local -- prisma db execute --schema prisma/schema.prisma --file prisma/sql/rls_policies.sql",
+    "db:studio": "dotenv -e .env.local -- prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.2",
+    "@supabase/ssr": "^0.9.0",
+    "@supabase/supabase-js": "^2.99.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.577.0",
+    "next": "^16.1.7",
+    "prisma": "^6.19.2",
+    "react": "^18",
+    "react-dom": "^18",
+    "tailwind-merge": "^3.5.0"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^8.0.0",
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.1.7",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}

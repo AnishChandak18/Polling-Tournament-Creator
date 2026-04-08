@@ -1,0 +1,225 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light mode semantic tokens */
+    --color-primary: #705e00;
+    --color-primary-dim: #5b4b00;
+    --color-on-primary: #ffffff;
+    --color-secondary: #004ba0;
+    --color-tertiary: #b92902;
+
+    --color-background: #f6f2fa;
+    --color-surface: #fbf8ff;
+    --color-surface-dim: #ece8ef;
+    --color-surface-bright: #ffffff;
+    --color-surface-variant: #ece8ef;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #f7f3fa;
+    --color-surface-container: #f1edf5;
+    --color-surface-container-high: #ebe7ef;
+    --color-surface-container-highest: #e5e1e9;
+    --color-surface-tint: #705e00;
+    --color-inverse-surface: #2b2b33;
+
+    --color-outline: #76747b;
+    --color-outline-variant: #c8c4ce;
+    --color-on-surface: #131318;
+    --color-on-surface-variant: #48474d;
+    --color-inverse-on-surface: #f6f2fa;
+  }
+
+  .dark {
+    /* Dark mode semantic tokens */
+    --color-primary: #ffe792;
+    --color-primary-dim: #efc900;
+    --color-on-primary: #655400;
+    --color-secondary: #72a2fd;
+    --color-tertiary: #ff716c;
+
+    --color-background: #0e0e13;
+    --color-surface: #0e0e13;
+    --color-surface-dim: #0e0e13;
+    --color-surface-bright: #2b2b33;
+    --color-surface-variant: #25252c;
+    --color-surface-container-lowest: #000000;
+    --color-surface-container-low: #131318;
+    --color-surface-container: #19191f;
+    --color-surface-container-high: #1f1f26;
+    --color-surface-container-highest: #25252c;
+    --color-surface-tint: #ffe792;
+    --color-inverse-surface: #fbf8ff;
+
+    --color-outline: #76747b;
+    --color-outline-variant: #48474d;
+    --color-on-surface: #f6f2fa;
+    --color-on-surface-variant: #acaab1;
+    --color-inverse-on-surface: #55545a;
+  }
+
+  body {
+    @apply font-sans transition-colors duration-300 selection:bg-primary selection:text-on-primary;
+    @apply bg-background text-on-surface;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-bold uppercase italic tracking-tighter;
+  }
+
+  .font-display {
+    font-family: var(--font-space-grotesk), sans-serif;
+    @apply font-bold uppercase italic tracking-tighter;
+  }
+}
+
+@layer components {
+  /* Base button shape — Stitch Component Library: rounded-xl, scale on press */
+  .btn-base {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-display font-bold uppercase tracking-wide transition-all active:scale-95;
+  }
+
+  /* Primary: gold container + dark text (Stitch "Primary Gold") */
+  .btn-primary {
+    @apply btn-base bg-primary-container text-on-primary-fixed shadow-lg hover:scale-[1.02];
+    @apply shadow-[0_4px_24px_rgba(255,215,9,0.18)];
+  }
+
+  /* Secondary: blue fill */
+  .btn-secondary {
+    @apply btn-base bg-secondary-container text-on-secondary-container shadow-md hover:bg-secondary-container/90;
+  }
+
+  /* Outline — Stitch: neutral in light, blue outline in dark */
+  .btn-outline {
+    @apply btn-base border border-outline-variant bg-transparent text-on-surface hover:bg-surface-container-high;
+  }
+
+  .dark .btn-outline {
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+  }
+
+  .dark .btn-outline:hover {
+    background-color: color-mix(in srgb, var(--color-secondary) 12%, transparent);
+  }
+
+  /* Ghost: muted → primary on hover */
+  .btn-ghost {
+    @apply btn-base text-on-surface-variant hover:text-primary;
+    @apply dark:hover:bg-primary/5;
+  }
+
+  /* Disabled state (add alongside other variant) */
+  .btn-disabled {
+    @apply btn-base cursor-not-allowed bg-surface-container-highest text-outline opacity-60;
+  }
+
+  /* FAB */
+  .btn-fab {
+    @apply flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-on-primary shadow-[0_16px_32px_rgba(255,231,146,0.2)] transition-transform hover:scale-110;
+  }
+
+  /* Legacy alias kept for existing usages */
+  .btn-stadium {
+    @apply btn-base;
+  }
+
+  /* Surface card — tonal layer, soft border */
+  .card-stadium {
+    @apply rounded-2xl border bg-surface-container p-6 shadow-none transition-colors duration-300;
+    border-color: color-mix(in srgb, var(--color-outline-variant) 18%, transparent);
+  }
+
+  /* Elevated card — slightly higher surface */
+  .card-elevated {
+    @apply rounded-2xl border bg-surface-container-high p-6 transition-colors duration-300;
+    border-color: color-mix(in srgb, var(--color-outline-variant) 18%, transparent);
+  }
+
+  /* Match / prediction card inner gradient shell */
+  .card-match {
+    @apply rounded-[1.4rem] bg-gradient-to-br from-surface-container-highest to-surface-container-low p-6 space-y-6;
+  }
+
+  /* Glass morphism — Stitch Component Library */
+  .glass-card {
+    background: rgba(25, 25, 28, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(72, 71, 74, 0.3);
+    @apply rounded-xl;
+  }
+
+  /* Kinetic grid backdrop (optional page canvas) */
+  .kinetic-grid {
+    background-image: linear-gradient(to right, rgb(31 31 38 / 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(31 31 38 / 0.5) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Section header with left gold accent */
+  .section-header {
+    @apply border-l-4 border-primary-container pl-6;
+  }
+
+  /* Live badge */
+  .badge-live {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest text-tertiary;
+    background-color: color-mix(in srgb, var(--color-tertiary) 10%, transparent);
+  }
+
+  /* Settings row */
+  .settings-row {
+    @apply flex items-center justify-between rounded-xl border bg-surface-container-high p-4 backdrop-blur-sm;
+    border-color: color-mix(in srgb, var(--color-outline-variant) 12%, transparent);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Landing / hero — from Stitch Stadium Pulse - Landing */
+  .bg-stadium-mesh {
+    background-image: radial-gradient(
+      circle at 2px 2px,
+      rgba(255, 231, 146, 0.05) 1px,
+      transparent 0
+    );
+    background-size: 24px 24px;
+  }
+
+  .bg-hero-glow {
+    background: radial-gradient(circle at 50% -20%, rgba(255, 215, 9, 0.15) 0%, transparent 70%);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Stitch Home — Predict Now CTA */
+  .pulse-shadow {
+    box-shadow: 0 0 0 0 rgba(255, 231, 146, 0.35);
+    animation: pulse-gold 2s ease-in-out infinite;
+  }
+  @keyframes pulse-gold {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 231, 146, 0.45);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(255, 231, 146, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 231, 146, 0);
+    }
+  }
+}
