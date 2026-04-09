@@ -19,13 +19,4 @@ If you want to run the project locally:
 3. In the Supabase dashboard, enable email/password (and optional Google) sign-in, and add your local app URL plus `/auth/callback` and `/reset-password` to the allowed redirect URLs.
 4. Start the app: `npm run dev`
 
-Do not commit real secrets—keep them in `.env.local` only (see `.gitignore`).
-
-## Production
-
-- Set the same environment variables on your host (e.g. Vercel project settings) using values from `.env.local.example`—never commit real keys.
-- Build with `npm run build` and run with `npm start`, or use your platform’s default Next.js integration.
-- Before the app serves traffic against a new database, run migrations: `npm run db:deploy:prod` (requires `DATABASE_URL` in the environment; use your production Postgres URL).
-- In Supabase, set **Site URL** and **Redirect URLs** to your production domain (including `https://your-domain/auth/callback` and `https://your-domain/reset-password`).
-
 For deeper technical notes, explore the codebase and `package.json` scripts.
