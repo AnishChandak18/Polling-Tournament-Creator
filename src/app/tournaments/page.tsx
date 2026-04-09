@@ -2,18 +2,27 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import PageShell from "@/components/layout/PageShell";
 import PointsChip from "@/components/ui/PointsChip";
-import { getAuthContext, listUserTournaments } from "@/services/server";
+import {
+  getAuthContext,
+  getUserPointsChipTotal,
+  listUserTournaments,
+  syncFixturesForUserTournaments,
+} from "@/services/server";
 
 export default async function TournamentsPage() {
   const { supabaseUser, dbUser } = await getAuthContext();
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
 
-  const tournaments = await listUserTournaments(dbUser.id);
-  const points = 1240;
+  await syncFixturesForUserTournaments(dbUser.id);
+
+  const [tournaments, totalPoints] = await Promise.all([
+    listUserTournaments(dbUser.id),
+    getUserPointsChipTotal(dbUser.id),
+  ]);
 
   return (
-    <PageShell active="circles" maxWidth="max-w-3xl" rightSlot={<PointsChip points={points} />}>
+    <PageShell active="circles" maxWidth="max-w-3xl" rightSlot={<PointsChip points={totalPoints} />}>
       <header>
         <h1 className="font-display text-4xl font-black uppercase tracking-tight text-on-surface">Circles</h1>
         <p className="mt-2 text-sm text-on-surface-variant">Your created and joined tournaments.</p>

@@ -3,12 +3,18 @@ import Link from "next/link";
 import PageShell from "@/components/layout/PageShell";
 import StatBento from "@/components/ui/StatBento";
 import SignOutButton from "@/components/auth/SignOutButton";
-import { getAuthContext } from "@/services/server";
+import { getAuthContext, getUserBestRankInCircles, getUserPredictionCount } from "@/services/server";
 
 export default async function ProfilePage() {
   const { supabaseUser, dbUser } = await getAuthContext();
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
+
+  const [predictionCount, bestRank] = await Promise.all([
+    getUserPredictionCount(dbUser.id),
+    getUserBestRankInCircles(dbUser.id),
+  ]);
+  const rankLabel = bestRank != null ? `#${bestRank}` : "—";
 
   return (
     <PageShell
@@ -44,13 +50,13 @@ export default async function ProfilePage() {
       <section className="grid gap-4">
         <StatBento
           label="Total Predictions"
-          value="124"
+          value={String(predictionCount)}
           icon="ads_click"
           accent="primary"
         />
         <StatBento
-          label="Global Rank"
-          value="#42"
+          label="Best rank (your circles)"
+          value={rankLabel}
           icon="leaderboard"
           accent="secondary"
         />

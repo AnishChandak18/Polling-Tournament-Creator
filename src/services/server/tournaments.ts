@@ -1,5 +1,16 @@
 import { prisma } from "@/lib/prisma";
-import { upsertIplFixturesForTournament } from "@/services/server/api/sync";
+import { syncIplFixturesForTournamentIds, upsertIplFixturesForTournament } from "@/services/server/api/sync";
+
+/** Refresh IPL fixtures + match statuses for every circle the user can access (one schedule fetch). */
+export async function syncFixturesForUserTournaments(userId: string): Promise<void> {
+  const rows = await prisma.tournament.findMany({
+    where: {
+      OR: [{ ownerId: userId }, { members: { some: { userId } } }],
+    },
+    select: { id: true },
+  });
+  await syncIplFixturesForTournamentIds(rows.map((r) => r.id));
+}
 
 export async function listUserTournaments(
   userId: string,
@@ -21,10 +32,10 @@ export async function listUserTournaments(
       ...(options?.includeUpcomingMatch
         ? {
             matches: {
-              where: { status: "UPCOMING" },
+              where: { status: { in: ["UPCOMING", "LIVE"] } },
               orderBy: { matchDate: "asc" },
               take: 1,
-              select: { id: true, team1: true, team2: true, matchDate: true },
+              select: { id: true, team1: true, team2: true, matchDate: true, status: true },
             },
           }
         : {}),

@@ -8,7 +8,7 @@ import Link from "next/link";
  *   name: string;
  *   season: string | number;
  *   status: string;
- *   rank?: number;
+ *   rank?: number | null;
  *   nextMatch?: { team1: string; team2: string } | null;
  *   variant?: "default" | "prediction" | "ranking";
  *   isFirst?: boolean;
@@ -40,7 +40,9 @@ export default function CircleCard({
         ].join(" ")}
       >
         <div className="flex items-center gap-3">
-          <span className="w-6 text-center font-display font-bold text-on-surface-variant">{rank}</span>
+          <span className="min-w-[2rem] text-center font-display font-bold text-on-surface-variant">
+            {rank != null ? `#${rank}` : "—"}
+          </span>
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">{meta}</div>
             <div className="mt-1 font-semibold text-on-surface">{name}</div>

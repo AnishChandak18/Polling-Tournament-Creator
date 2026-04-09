@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import PageShell from "@/components/layout/PageShell";
 import PointsChip from "@/components/ui/PointsChip";
 import MatchVoteCard from "@/components/voting/MatchVoteCard";
-import { getAuthContext, getTournamentWithMatchesForUser } from "@/services/server";
+import { getAuthContext, getTournamentWithMatchesForUser, getUserPointsChipTotal } from "@/services/server";
 import { asMatchDisplayMeta, groupMatchesByScheduleDay } from "@/lib/match-display";
 import { isPastIst, isTodayIst } from "@/lib/ist";
 
@@ -17,16 +17,19 @@ export default async function TournamentVotePage({
   if (!dbUser) redirect("/login?error=database");
 
   const { id: tournamentId } = await params;
-  const tournament = await getTournamentWithMatchesForUser(tournamentId, dbUser.id);
+  const [tournament, totalPoints] = await Promise.all([
+    getTournamentWithMatchesForUser(tournamentId, dbUser.id),
+    getUserPointsChipTotal(dbUser.id),
+  ]);
   if (!tournament) redirect("/tournaments");
 
-  const points = 1240;
-
-  const voteToday = tournament.matches.filter((m) => m.status === "UPCOMING" && isTodayIst(m.matchDate));
+  const voteToday = tournament.matches.filter(
+    (m) => (m.status === "UPCOMING" || m.status === "LIVE") && isTodayIst(m.matchDate)
+  );
   const upcomingOther = tournament.matches.filter(
     (m) => m.status === "UPCOMING" && !isTodayIst(m.matchDate) && !isPastIst(m.matchDate)
   );
-  const completed = tournament.matches.filter((m) => m.status === "COMPLETED" || isPastIst(m.matchDate));
+  const completed = tournament.matches.filter((m) => m.status === "COMPLETED");
 
   type M = (typeof tournament.matches)[number];
 
@@ -62,7 +65,7 @@ export default async function TournamentVotePage({
     <PageShell
       active="predictions"
       maxWidth="max-w-3xl"
-      rightSlot={<PointsChip points={points} />}
+      rightSlot={<PointsChip points={totalPoints} />}
     >
       <div className="mb-2">
         <Link

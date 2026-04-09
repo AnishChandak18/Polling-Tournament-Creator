@@ -6,7 +6,15 @@ import CircleBuzz from "@/components/dashboard/CircleBuzz";
 import DashboardCircleCard from "@/components/dashboard/DashboardCircleCard";
 import DashboardLiveCard from "@/components/dashboard/DashboardLiveCard";
 import DashboardLiveEmpty from "@/components/dashboard/DashboardLiveEmpty";
-import { getAuthContext, listUserTournaments } from "@/services/server";
+import {
+  getAuthContext,
+  getRecentCircleActivity,
+  getUserBestRankInCircles,
+  getUserPointsChipTotal,
+  getUserPredictionCount,
+  listUserTournaments,
+  syncFixturesForUserTournaments,
+} from "@/services/server";
 import { isTodayIst } from "@/lib/ist";
 
 export default async function DashboardPage() {
@@ -14,12 +22,18 @@ export default async function DashboardPage() {
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
 
-  const tournaments = await listUserTournaments(dbUser.id, {
-    take: 8,
-    includeUpcomingMatch: true,
-  });
+  await syncFixturesForUserTournaments(dbUser.id);
 
-  const points = 2450;
+  const [tournaments, totalPoints, bestRank, predictionCount, activity] = await Promise.all([
+    listUserTournaments(dbUser.id, {
+      take: 8,
+      includeUpcomingMatch: true,
+    }),
+    getUserPointsChipTotal(dbUser.id),
+    getUserBestRankInCircles(dbUser.id),
+    getUserPredictionCount(dbUser.id),
+    getRecentCircleActivity(dbUser.id, 6),
+  ]);
 
   const spotlight = tournaments
     .map((t) => (t.matches?.[0] ? { tournament: t, match: t.matches[0] } : null))
@@ -29,12 +43,16 @@ export default async function DashboardPage() {
     ? `/tournaments/${spotlight.tournament.id}/vote`
     : "/predictions";
 
+  const rankLabel = bestRank != null ? `#${bestRank}` : "—";
+  const rankSub =
+    bestRank != null ? "Best among your circles" : "Join a circle to get ranked";
+
   return (
     <PageShell
       active="home"
       maxWidth="max-w-md"
       className="px-4"
-      rightSlot={<PointsChip points={points} />}
+      rightSlot={<PointsChip points={totalPoints} />}
     >
       <div className="flex flex-col gap-6">
         {spotlight ? (
@@ -43,34 +61,36 @@ export default async function DashboardPage() {
             team2={spotlight.match.team2}
             matchDate={new Date(spotlight.match.matchDate)}
             season={spotlight.tournament.season}
-            isLiveDay={isTodayIst(new Date(spotlight.match.matchDate))}
+            isLiveDay={
+              spotlight.match.status === "LIVE" || isTodayIst(new Date(spotlight.match.matchDate))
+            }
             predictHref={predictHref}
           />
         ) : (
           <DashboardLiveEmpty />
         )}
 
-        {/* Your standing — Stitch 2-col */}
         <section className="grid grid-cols-2 gap-4">
           <div className="rounded-xl border border-outline-variant bg-surface-container-high p-4">
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Current Rank</p>
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+              Best rank
+            </p>
             <div className="flex items-baseline gap-1">
-              <span className="font-display text-3xl font-black text-primary-container">#14</span>
-              <span className="text-[10px] font-bold text-green-400">▲ 2</span>
+              <span className="font-display text-3xl font-black text-primary-container">{rankLabel}</span>
             </div>
+            <p className="mt-2 text-[10px] font-bold leading-snug text-on-surface-variant">{rankSub}</p>
           </div>
           <div className="flex flex-col justify-between rounded-xl border border-outline-variant bg-surface-container-high p-4">
             <div>
-              <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Next Level</p>
-              <p className="text-xs font-bold text-on-surface">Stadium Legend</p>
-            </div>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-              <div className="h-full w-[72%] rounded-full bg-primary-container" />
+              <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                Predictions
+              </p>
+              <p className="font-display text-3xl font-black text-on-surface">{predictionCount}</p>
+              <p className="mt-1 text-[10px] font-bold text-on-surface-variant">All-time picks</p>
             </div>
           </div>
         </section>
 
-        {/* Private circles — horizontal strip */}
         <section className="space-y-3">
           <div className="flex items-end justify-between">
             <h3 className="font-display text-sm font-black uppercase tracking-widest text-on-surface">
@@ -104,7 +124,7 @@ export default async function DashboardPage() {
           </div>
         </section>
 
-        <CircleBuzz />
+        <CircleBuzz items={activity} />
       </div>
     </PageShell>
   );

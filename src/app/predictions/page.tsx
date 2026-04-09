@@ -3,22 +3,32 @@ import { redirect } from "next/navigation";
 import PageShell from "@/components/layout/PageShell";
 import PointsChip from "@/components/ui/PointsChip";
 import CircleCard from "@/components/cards/CircleCard";
-import { getAuthContext, listUserTournaments } from "@/services/server";
+import {
+  getAuthContext,
+  getUserPointsChipTotal,
+  listUserTournaments,
+  syncFixturesForUserTournaments,
+} from "@/services/server";
 
 export default async function PredictionsPage() {
   const { supabaseUser, dbUser } = await getAuthContext();
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
 
-  const tournaments = await listUserTournaments(dbUser.id, {
-    take: 8,
-    includeUpcomingMatch: true,
-  });
+  await syncFixturesForUserTournaments(dbUser.id);
+
+  const [tournaments, totalPoints] = await Promise.all([
+    listUserTournaments(dbUser.id, {
+      take: 8,
+      includeUpcomingMatch: true,
+    }),
+    getUserPointsChipTotal(dbUser.id),
+  ]);
 
   return (
     <PageShell
       active="predictions"
-      rightSlot={<PointsChip points={2450} />}
+      rightSlot={<PointsChip points={totalPoints} />}
     >
       <header className="section-header">
         <h1 className="font-display text-4xl font-black tracking-tight text-on-surface">Match Predictions</h1>

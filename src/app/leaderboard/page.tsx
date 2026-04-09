@@ -3,19 +3,31 @@ import { redirect } from "next/navigation";
 import PageShell from "@/components/layout/PageShell";
 import PointsChip from "@/components/ui/PointsChip";
 import CircleCard from "@/components/cards/CircleCard";
-import { getAuthContext, listUserTournaments } from "@/services/server";
+import {
+  getAuthContext,
+  getUserPointsChipTotal,
+  getUserRankInTournament,
+  listUserTournaments,
+  syncFixturesForUserTournaments,
+} from "@/services/server";
 
 export default async function LeaderboardPage() {
   const { supabaseUser, dbUser } = await getAuthContext();
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
 
+  await syncFixturesForUserTournaments(dbUser.id);
+
   const tournaments = await listUserTournaments(dbUser.id, { take: 12 });
+  const [totalPoints, ...ranks] = await Promise.all([
+    getUserPointsChipTotal(dbUser.id),
+    ...tournaments.map((t) => getUserRankInTournament(dbUser.id, t.id)),
+  ]);
 
   return (
     <PageShell
       active="leaderboard"
-      rightSlot={<PointsChip points={2450} />}
+      rightSlot={<PointsChip points={totalPoints} />}
     >
       <header className="text-center">
         <h1 className="font-display text-5xl font-black tracking-tight text-on-surface">
@@ -56,8 +68,8 @@ export default async function LeaderboardPage() {
                 season={t.season}
                 status={t.status}
                 variant="ranking"
-                rank={idx + 1}
-                isFirst={idx === 0}
+                rank={ranks[idx]}
+                isFirst={ranks[idx] === 1}
               />
             ))
           )}
