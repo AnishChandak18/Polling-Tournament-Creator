@@ -3,6 +3,7 @@ import { getCurrentUserOrThrow } from "@/lib/currentUser";
 import { recalculateTournamentScores } from "@/lib/leaderboard";
 import { HttpError } from "@/services/server/api/errors";
 import { upsertIplFixturesForTournament } from "@/services/server/api/sync";
+import { isUserFixtureSyncFresh } from "@/services/server/fixture-sync";
 
 export async function listTournamentsForCurrentUser() {
   const user = await getCurrentUserOrThrow();
@@ -67,7 +68,13 @@ export async function getTournamentForCurrentUserById(tournamentId: string) {
     throw new HttpError("Not found", 404);
   }
 
-  await upsertIplFixturesForTournament(allowed.id);
+  if (!(await isUserFixtureSyncFresh(user.id))) {
+    await upsertIplFixturesForTournament(allowed.id);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastFixtureSyncAt: new Date() },
+    });
+  }
 
   const tournament = await prisma.tournament.findFirst({
     where: {

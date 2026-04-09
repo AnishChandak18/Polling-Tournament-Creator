@@ -4,7 +4,7 @@ import { fetchIplFixtures } from "@/lib/ipl";
 import type { IplFixture } from "@/lib/ipl";
 
 /** ~T20 window: after this from kickoff, treat match as finished for UI status. */
-const MATCH_ASSUMED_DURATION_MS = 5.5 * 60 * 60 * 1000;
+export const MATCH_ASSUMED_DURATION_MS = 5.5 * 60 * 60 * 1000;
 
 /** After first DB error, skip `displayMeta` until process restart (column added → restart dev server). */
 let skipDisplayMetaColumn = false;

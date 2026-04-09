@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { getAuthCallbackUrl } from "@/lib/auth-browser";
+import { getAuthCallbackUrl, setAuthRedirectCookie } from "@/lib/auth-browser";
+import { safeNextPath } from "@/lib/auth-redirect";
 import AuthStitchLayout from "@/components/auth/AuthStitchLayout";
 import GoogleGlyph from "@/components/auth/GoogleGlyph";
 import { Alert } from "@/components/ui/Alert";
@@ -33,11 +34,12 @@ export default function SignupClient() {
     setOauthLoading(true);
     setError(null);
     try {
+      setAuthRedirectCookie(next);
       const supabase = createSupabaseBrowserClient();
       await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: getAuthCallbackUrl(next),
+          redirectTo: getAuthCallbackUrl(),
         },
       });
     } catch (e: unknown) {
@@ -57,13 +59,14 @@ export default function SignupClient() {
     setError(null);
     setCheckEmail(false);
     try {
+      setAuthRedirectCookie(next);
       const supabase = createSupabaseBrowserClient();
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: trimmedEmail,
         password,
         options: {
           data: { full_name: name.trim() || null },
-          emailRedirectTo: getAuthCallbackUrl(next),
+          emailRedirectTo: getAuthCallbackUrl(),
         },
       });
       if (signUpError) {
@@ -71,7 +74,7 @@ export default function SignupClient() {
         return;
       }
       if (data.session) {
-        window.location.href = next;
+        window.location.href = safeNextPath(next);
         return;
       }
       setCheckEmail(true);
@@ -101,7 +104,10 @@ export default function SignupClient() {
               We sent a confirmation link to <span className="font-medium text-on-surface">{email}</span>. Open it to
               finish creating your account.
             </p>
-            <Link href="/login" className="btn-outline mt-6 inline-flex w-full justify-center py-3 text-sm">
+            <Link
+              href={next === "/dashboard" ? "/login" : `/login?next=${encodeURIComponent(next)}`}
+              className="btn-outline mt-6 inline-flex w-full justify-center py-3 text-sm"
+            >
               Back to login
             </Link>
           </div>
@@ -216,7 +222,10 @@ export default function SignupClient() {
           <div className="mt-8 space-y-4 text-center">
             <p className="text-sm text-zinc-500">
               Already have an account?{" "}
-              <Link href="/login" className="font-bold text-primary underline decoration-2 underline-offset-4 hover:underline">
+              <Link
+                href={next === "/dashboard" ? "/login" : `/login?next=${encodeURIComponent(next)}`}
+                className="font-bold text-primary underline decoration-2 underline-offset-4 hover:underline"
+              >
                 Log in
               </Link>
             </p>

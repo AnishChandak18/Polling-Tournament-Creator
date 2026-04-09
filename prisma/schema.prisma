@@ -30,7 +30,13 @@ model User {
   supabaseId String   @unique
   email      String   @unique
   name       String?
+  /// Public handle (unique when set).
+  username   String?  @unique
   avatarUrl  String?
+  /// Last successful IPL fixture sync for this user (throttles repeat work).
+  lastFixtureSyncAt DateTime?
+  /// Set when user finishes onboarding (username/settings step).
+  onboardingCompletedAt DateTime?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -46,6 +52,9 @@ model Tournament {
   type      TournamentType   @default(IPL)
   status    TournamentStatus @default(UPCOMING)
   ownerId   String
+  /// Opaque invite token for `/join?t=...` (rotated by owner).
+  inviteToken           String?   @unique
+  inviteTokenCreatedAt  DateTime?
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 

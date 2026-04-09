@@ -12,8 +12,10 @@
     "lint": "eslint .",
     "postinstall": "prisma generate",
     "db:migrate": "dotenv -e .env.local -- prisma db push",
+    "db:push": "dotenv -e .env.local -- prisma db push",
     "db:deploy": "dotenv -e .env.local -- prisma migrate deploy",
     "db:deploy:prod": "prisma migrate deploy",
+    "db:baseline-resolve": "dotenv -e .env.local -- prisma migrate resolve --applied 20260331120000_add_match_display_meta && dotenv -e .env.local -- prisma migrate resolve --applied 20260409120000_user_last_fixture_sync && dotenv -e .env.local -- prisma migrate resolve --applied 20260409130000_invite_and_profile",
     "db:add-display-meta": "dotenv -e .env.local -- prisma db execute --schema prisma/schema.prisma --file prisma/migrations/20260331120000_add_match_display_meta/migration.sql",
     "db:secure": "dotenv -e .env.local -- prisma db execute --schema prisma/schema.prisma --file prisma/sql/rls_policies.sql",
     "db:studio": "dotenv -e .env.local -- prisma studio"

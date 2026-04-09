@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { getAuthCallbackUrl } from "@/lib/auth-browser";
+import { getAuthCallbackUrl, setAuthRedirectCookie } from "@/lib/auth-browser";
 import AuthStitchLayout from "@/components/auth/AuthStitchLayout";
 import { Alert } from "@/components/ui/Alert";
 import { Input } from "@/components/ui/input";
@@ -33,9 +33,10 @@ export default function ForgotPasswordClient() {
     setError(null);
     setSent(false);
     try {
+      setAuthRedirectCookie("/reset-password");
       const supabase = createSupabaseBrowserClient();
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmed, {
-        redirectTo: getAuthCallbackUrl("/reset-password"),
+        redirectTo: getAuthCallbackUrl(),
       });
       if (resetError) {
         setError(resetError.message);

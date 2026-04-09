@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import MatchVoteCard from "@/components/voting/MatchVoteCard";
 import BackButton from "@/components/common/BackButton";
+import InviteToCircleClient from "@/components/circles/InviteToCircleClient";
 import { getAuthContext, getTournamentWithMatchesForUser } from "@/services/server";
 import { asMatchDisplayMeta, groupMatchesByScheduleDay } from "@/lib/match-display";
 
@@ -27,6 +28,7 @@ export default async function TournamentDetailPage({
   if (!tournament) redirect("/tournaments");
 
   const scheduleGroups = groupMatchesByScheduleDay(tournament.matches);
+  const isOwner = tournament.ownerId === dbUser.id;
 
   return (
     <main className="min-h-screen bg-background bg-stadium-mesh p-6 text-on-surface">
@@ -78,6 +80,8 @@ export default async function TournamentDetailPage({
               </div>
             </div>
           </div>
+
+          <InviteToCircleClient tournamentId={tournament.id} isOwner={isOwner} />
 
           <div className="mt-6 overflow-hidden rounded-2xl border border-outline-variant/15 bg-surface-container-low/50">
             <div className="border-b border-outline-variant/15 p-4 font-display text-sm font-black uppercase tracking-wider">

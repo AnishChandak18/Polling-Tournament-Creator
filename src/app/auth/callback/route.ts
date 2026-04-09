@@ -1,22 +1,29 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
+import { getRequestOrigin } from "@/lib/request-origin";
+import {
+  AUTH_REDIRECT_COOKIE,
+  resolvePostAuthRedirect,
+} from "@/lib/auth-redirect";
 
-function getRequestOrigin(request: Request) {
-  const url = new URL(request.url);
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  const forwardedProto = request.headers.get("x-forwarded-proto");
-  const host = forwardedHost ?? request.headers.get("host");
-  const proto = forwardedProto ?? url.protocol.replace(":", "");
-  if (host) return `${proto}://${host}`;
-  return url.origin;
+function successRedirect(origin: string, nextPath: string) {
+  const p = nextPath.startsWith("/") ? nextPath : `/${nextPath}`;
+  const response = NextResponse.redirect(`${origin}${p}`);
+  response.cookies.set(AUTH_REDIRECT_COOKIE, "", { path: "/", maxAge: 0 });
+  return response;
 }
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const origin = getRequestOrigin(request);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const cookieStore = await cookies();
+  const next = resolvePostAuthRedirect(
+    searchParams.get("next"),
+    cookieStore.get(AUTH_REDIRECT_COOKIE)?.value
+  );
 
   if (!code) return NextResponse.redirect(`${origin}/login`);
 
@@ -63,9 +70,12 @@ export async function GET(request: Request) {
 
   const recoveryNext = next === "/reset-password" || next.startsWith("/reset-password?");
   if (isNewUser && !recoveryNext) {
-    return NextResponse.redirect(`${origin}/onboarding`);
+    if (next.startsWith("/join")) {
+      return successRedirect(origin, next);
+    }
+    return successRedirect(origin, "/onboarding");
   }
 
-  return NextResponse.redirect(`${origin}${next}`);
+  return successRedirect(origin, next);
 }
 

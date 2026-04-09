@@ -47,6 +47,18 @@ export async function getTournament(tournamentId: string) {
   return apiRequest<{ tournament: TournamentDetail }>(`/api/tournaments/${tournamentId}`);
 }
 
+export async function getTournamentInvite(tournamentId: string) {
+  return apiRequest<{ inviteUrl: string | null }>(
+    `/api/tournaments/${tournamentId}/invite`
+  );
+}
+
+export async function rotateTournamentInvite(tournamentId: string) {
+  return apiRequest<{ inviteUrl: string }>(`/api/tournaments/${tournamentId}/invite`, {
+    method: "POST",
+  });
+}
+
 export async function setMatchWinner(payload: {
   tournamentId: string;
   matchId: string;

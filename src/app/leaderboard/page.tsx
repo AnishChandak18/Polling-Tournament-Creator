@@ -8,7 +8,7 @@ import {
   getUserPointsChipTotal,
   getUserRankInTournament,
   listUserTournaments,
-  syncFixturesForUserTournaments,
+  scheduleFixtureSyncForUser,
 } from "@/services/server";
 
 export default async function LeaderboardPage() {
@@ -16,7 +16,7 @@ export default async function LeaderboardPage() {
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
 
-  await syncFixturesForUserTournaments(dbUser.id);
+  await scheduleFixtureSyncForUser(dbUser.id);
 
   const tournaments = await listUserTournaments(dbUser.id, { take: 12 });
   const [totalPoints, ...ranks] = await Promise.all([

@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { getAuthCallbackUrl } from "@/lib/auth-browser";
+import { getAuthCallbackUrl, setAuthRedirectCookie } from "@/lib/auth-browser";
+import { safeNextPath } from "@/lib/auth-redirect";
 import AuthStitchLayout from "@/components/auth/AuthStitchLayout";
 import GoogleGlyph from "@/components/auth/GoogleGlyph";
 import { Alert } from "@/components/ui/Alert";
@@ -31,11 +32,12 @@ export default function LoginClient() {
     setOauthLoading(true);
     setError(null);
     try {
+      setAuthRedirectCookie(next);
       const supabase = createSupabaseBrowserClient();
       await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: getAuthCallbackUrl(next),
+          redirectTo: getAuthCallbackUrl(),
         },
       });
     } catch (e: unknown) {
@@ -63,7 +65,7 @@ export default function LoginClient() {
         setError(signError.message);
         return;
       }
-      window.location.href = next;
+      window.location.href = safeNextPath(next);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Sign-in failed.");
     } finally {
@@ -172,7 +174,7 @@ export default function LoginClient() {
           <p className="text-xs font-medium uppercase tracking-wide text-on-surface-variant">
             New to the Stadium?{" "}
             <Link
-              href="/signup"
+              href={next === "/dashboard" ? "/signup" : `/signup?next=${encodeURIComponent(next)}`}
               className="ml-1 font-black text-primary underline-offset-4 hover:underline"
             >
               Create an account

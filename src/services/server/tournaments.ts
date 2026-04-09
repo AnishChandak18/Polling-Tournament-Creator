@@ -1,16 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { syncIplFixturesForTournamentIds, upsertIplFixturesForTournament } from "@/services/server/api/sync";
-
-/** Refresh IPL fixtures + match statuses for every circle the user can access (one schedule fetch). */
-export async function syncFixturesForUserTournaments(userId: string): Promise<void> {
-  const rows = await prisma.tournament.findMany({
-    where: {
-      OR: [{ ownerId: userId }, { members: { some: { userId } } }],
-    },
-    select: { id: true },
-  });
-  await syncIplFixturesForTournamentIds(rows.map((r) => r.id));
-}
+import { upsertIplFixturesForTournament } from "@/services/server/api/sync";
+import { isUserFixtureSyncFresh } from "@/services/server/fixture-sync";
 
 export async function listUserTournaments(
   userId: string,
@@ -69,7 +59,13 @@ export async function getTournamentWithMatchesForUser(
   });
   if (!allowed) return null;
 
-  await upsertIplFixturesForTournament(allowed.id);
+  if (!(await isUserFixtureSyncFresh(userId))) {
+    await upsertIplFixturesForTournament(allowed.id);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { lastFixtureSyncAt: new Date() },
+    });
+  }
 
   return prisma.tournament.findFirst({
     where: {

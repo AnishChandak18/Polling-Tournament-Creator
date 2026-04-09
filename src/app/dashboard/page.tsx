@@ -13,7 +13,7 @@ import {
   getUserPointsChipTotal,
   getUserPredictionCount,
   listUserTournaments,
-  syncFixturesForUserTournaments,
+  scheduleFixtureSyncForUser,
 } from "@/services/server";
 import { isTodayIst } from "@/lib/ist";
 
@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
 
-  await syncFixturesForUserTournaments(dbUser.id);
+  await scheduleFixtureSyncForUser(dbUser.id);
 
   const [tournaments, totalPoints, bestRank, predictionCount, activity] = await Promise.all([
     listUserTournaments(dbUser.id, {
