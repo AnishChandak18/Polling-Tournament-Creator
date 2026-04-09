@@ -7,7 +7,8 @@ function applyEffectiveDarkClass(isDark: boolean) {
 }
 
 export function setColorMode(mode: ColorMode) {
-  // UI is locked to dark mode for now.
+  // UI is locked to dark mode for now; keep signature for future light/system.
+  void mode;
   localStorage.setItem(MODE_KEY, "dark");
   applyEffectiveDarkClass(true);
 }

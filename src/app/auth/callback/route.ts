@@ -61,7 +61,8 @@ export async function GET(request: Request) {
     }
   }
 
-  if (isNewUser) {
+  const recoveryNext = next === "/reset-password" || next.startsWith("/reset-password?");
+  if (isNewUser && !recoveryNext) {
     return NextResponse.redirect(`${origin}/onboarding`);
   }
 

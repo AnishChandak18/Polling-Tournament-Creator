@@ -13,30 +13,24 @@ export default async function Home() {
     <div className="min-h-screen bg-background bg-stadium-mesh text-on-surface">
       <TopBar
         rightSlot={
-          <div className="flex items-center gap-3">
+          <div className="hidden items-center gap-6 md:flex">
             <Link
               href="/predictions"
-              className="hidden font-display text-sm font-bold tracking-tight text-zinc-400 hover:text-primary-container md:block"
+              className="font-display text-sm font-bold tracking-tight text-zinc-400 hover:text-primary-container"
             >
               Predictions
             </Link>
             <Link
               href="/tournaments"
-              className="hidden font-display text-sm font-bold tracking-tight text-zinc-400 hover:text-primary-container md:block"
+              className="font-display text-sm font-bold tracking-tight text-zinc-400 hover:text-primary-container"
             >
               Circles
             </Link>
             <Link
               href="/leaderboard"
-              className="hidden font-display text-sm font-bold tracking-tight text-zinc-400 hover:text-primary-container md:block"
+              className="font-display text-sm font-bold tracking-tight text-zinc-400 hover:text-primary-container"
             >
               Rankings
-            </Link>
-            <Link
-              href="/login"
-              className="rounded-full border border-primary-container/35 bg-surface-container-high px-4 py-1.5 font-display text-sm font-bold text-primary-container"
-            >
-              Login
             </Link>
           </div>
         }
@@ -80,14 +74,11 @@ export default async function Home() {
 
         <section className="mt-12 w-full space-y-4 pb-8">
           <Link
-            href="/onboarding"
+            href="/signup"
             className="btn-primary flex w-full items-center justify-center gap-2 py-4 text-base"
           >
             <span>Get Started</span>
             <span className="material-symbols-outlined font-bold">arrow_forward</span>
-          </Link>
-          <Link href="/login" className="btn-outline flex w-full justify-center py-4 text-base">
-            Sign In
           </Link>
 
           <div className="grid grid-cols-3 gap-4 border-t border-outline-variant/20 pt-8">

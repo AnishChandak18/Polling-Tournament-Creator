@@ -1,85 +1,31 @@
-# IPL Polling Tournament Creator
+# Stadium Pulse
 
-Next.js + Supabase app to create IPL tournaments, vote on daily matches, and view a leaderboard.
+**Stadium Pulse** is a social IPL prediction experience: create private circles with friends, cast your picks on match day, and climb the leaderboard—for bragging rights only. No money, no stakes—just the fun of calling the game.
 
-## Requirements
+## What you can do
 
-- Node.js 18+
-- A Supabase project (Postgres + Auth)
-- Google OAuth credentials (for Supabase Auth)
+- **Circles** — Create or join a private group and compete on your own leaderboard.
+- **Predictions** — Vote on matches when voting opens on match day.
+- **Rankings** — See how you stack up in each circle and chase the top spot.
 
-## Setup (local)
+The app is built around the Indian Premier League schedule and is meant for fans who enjoy the ritual of predictions and friendly rivalry.
 
-1. Install deps
+## For developers
 
-```bash
-npm install
-```
+If you want to run the project locally:
 
-2. Create `.env.local` from the template
+1. Install dependencies: `npm install`
+2. Copy `.env.local.example` to `.env.local` and add your Supabase URL, anon key, and database URL (see the example file for placeholders).
+3. In the Supabase dashboard, enable email/password (and optional Google) sign-in, and add your local app URL plus `/auth/callback` and `/reset-password` to the allowed redirect URLs.
+4. Start the app: `npm run dev`
 
-```bash
-cp .env.local.example .env.local
-```
+Do not commit real secrets—keep them in `.env.local` only (see `.gitignore`).
 
-3. Create a Supabase project
+## Production
 
-- In Supabase: **Authentication → Providers → Google** → enable it and paste your Google Client ID/Secret.
-- In Google Cloud Console: add **Authorized redirect URIs** pointing to Supabase’s callback URL (Supabase UI shows it).
-- In Supabase: add redirect URLs for:
-  - `http://localhost:3000/**`
-  - LAN dev (e.g. `http://192.168.x.x:3000/**`) if you test from other devices
-  - your production domain when you deploy
+- Set the same environment variables on your host (e.g. Vercel project settings) using values from `.env.local.example`—never commit real keys.
+- Build with `npm run build` and run with `npm start`, or use your platform’s default Next.js integration.
+- Before the app serves traffic against a new database, run migrations: `npm run db:deploy:prod` (requires `DATABASE_URL` in the environment; use your production Postgres URL).
+- In Supabase, set **Site URL** and **Redirect URLs** to your production domain (including `https://your-domain/auth/callback` and `https://your-domain/reset-password`).
 
-4. Fill env vars in `.env.local`
-
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `DATABASE_URL` (Supabase Postgres connection string)
-- Optional IPL provider settings (`CRICAPI_*` or fallback base)
-
-5. Run dev server
-
-```bash
-npm run dev
-```
-
-## What belongs in git vs local only
-
-- **Committed:** application source, Prisma schema/migrations, `.env*.example` templates, config that has no secrets.
-- **Never committed:** `.env`, `.env.local`, and other env files with real keys (see `.gitignore`). Copy from `.env.local.example` locally.
-
-## Services Architecture
-
-Use these folders to keep API/data code DRY:
-
-- `src/services/api/*`
-  - Client-side API callers (`fetch` wrappers for `/api/*`).
-  - Use this in client components/pages.
-  - Example: `createTournament`, `submitVote`, `getTournament`.
-
-- `src/services/server/*`
-  - Server-side data services for App Router pages.
-  - Use this in server pages/components (`src/app/**/page.tsx`) to avoid repeating auth/prisma query patterns.
-  - Example: `getAuthContext`, `listUserTournaments`.
-
-- `src/services/server/api/*`
-  - Business logic used by route handlers (`src/app/api/*`).
-  - Route handlers should stay thin: parse request -> call service -> return response.
-  - Shared error mapping lives in `errors.ts` (`HttpError`, `toErrorResponse`).
-
-### Rule of thumb
-
-- UI/client code should not call Prisma directly.
-- Route files should not contain heavy business logic.
-- Shared flows (auth checks, ownership checks, validation) should live in services.
-
-## API Route Test Helpers
-
-`src/services/server/api/testHelpers.ts` provides tiny helpers for route/service tests:
-
-- `makeRouteContext(params)` -> creates `{ params: Promise.resolve(params) }`
-- `makeJsonRequest(method, body, url?)` -> builds JSON `Request`
-- `expectHttpError(fn, status)` -> asserts service rejects with `HttpError(status)`
-
-These are framework-agnostic and work with any test runner you add later (Vitest/Jest).
+For deeper technical notes, explore the codebase and `package.json` scripts.

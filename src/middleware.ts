@@ -41,6 +41,8 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isProtectedRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/tournaments");
   const isSetupRoute = pathname.startsWith("/setup");
+  const isAuthGateRoute =
+    pathname === "/login" || pathname === "/signup" || pathname === "/forgot-password";
 
   if (!supabase) {
     if (isProtectedRoute) {
@@ -86,7 +88,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && pathname === "/login") {
+  if (user && isAuthGateRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
@@ -102,6 +104,15 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/tournaments/:path*", "/login", "/auth/callback", "/setup"],
+  matcher: [
+    "/dashboard/:path*",
+    "/tournaments/:path*",
+    "/login",
+    "/signup",
+    "/forgot-password",
+    "/reset-password",
+    "/auth/callback",
+    "/setup",
+  ],
 };
 

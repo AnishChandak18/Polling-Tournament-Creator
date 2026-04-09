@@ -45,5 +45,8 @@ coverage/
 # --- Prisma ---
 # Generated client is in node_modules; keep schema/migrations in git.
 
+# --- Design reference exports (optional local; large) ---
+design/stitch/
+
 # --- Misc ---
 *.pem
