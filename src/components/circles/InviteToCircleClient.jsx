@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 
 export default function InviteToCircleClient({ tournamentId, isOwner }) {
   const [inviteUrl, setInviteUrl] = useState(null);
+  const [joinCode, setJoinCode] = useState("");
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
@@ -17,7 +18,10 @@ export default function InviteToCircleClient({ tournamentId, isOwner }) {
     setLoading(true);
     setError(null);
     getTournamentInvite(tournamentId)
-      .then((r) => setInviteUrl(r.inviteUrl))
+      .then((r) => {
+        setInviteUrl(r.inviteUrl);
+        setJoinCode(r.joinCode);
+      })
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load invite"))
       .finally(() => setLoading(false));
   }, [isOwner, tournamentId]);
@@ -32,6 +36,7 @@ export default function InviteToCircleClient({ tournamentId, isOwner }) {
     try {
       const r = await rotateTournamentInvite(tournamentId);
       setInviteUrl(r.inviteUrl);
+      setJoinCode(r.joinCode);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not update link");
     } finally {
@@ -43,6 +48,17 @@ export default function InviteToCircleClient({ tournamentId, isOwner }) {
     if (!inviteUrl) return;
     try {
       await navigator.clipboard.writeText(inviteUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setError("Clipboard not available");
+    }
+  }
+
+  async function copyCode() {
+    if (!joinCode) return;
+    try {
+      await navigator.clipboard.writeText(joinCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -70,12 +86,23 @@ export default function InviteToCircleClient({ tournamentId, isOwner }) {
         <p className="mt-4 text-xs text-on-surface-variant">Loading invite…</p>
       ) : inviteUrl ? (
         <div className="mt-4 space-y-3">
+          <div className="rounded-xl border border-outline-variant/30 bg-surface-container-high px-3 py-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+              Circle code
+            </p>
+            <p className="mt-1 font-mono text-lg font-bold tracking-[0.22em] text-on-surface">
+              {joinCode}
+            </p>
+          </div>
           <div className="break-all rounded-xl border border-outline-variant/30 bg-surface-container-high px-3 py-2 font-mono text-xs text-on-surface">
             {inviteUrl}
           </div>
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="default" disabled={busy} onClick={copy}>
               {copied ? "Copied" : "Copy link"}
+            </Button>
+            <Button type="button" variant="outline" disabled={busy} onClick={copyCode}>
+              Copy code
             </Button>
             <Button type="button" variant="outline" disabled={busy} onClick={generateOrRotate}>
               {busy ? "Working…" : "New link"}

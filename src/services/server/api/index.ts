@@ -14,3 +14,4 @@ export {
   getInviteLinkForCurrentUser,
   rotateInviteForCurrentUser,
 } from "@/services/server/api/tournament-invite";
+export { getLiveMatchForCurrentUser } from "@/services/server/api/match-live";

@@ -6,3 +6,10 @@ export async function joinWithInviteToken(token: string) {
     body: { token },
   });
 }
+
+export async function joinWithCircleCode(code: string) {
+  return apiRequest<{ tournamentId: string; alreadyMember: boolean }>("/api/join", {
+    method: "POST",
+    body: { code },
+  });
+}

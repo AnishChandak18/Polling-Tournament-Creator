@@ -25,32 +25,26 @@ export default async function LeaderboardPage() {
   ]);
 
   return (
-    <PageShell
-      active="leaderboard"
-      rightSlot={<PointsChip points={totalPoints} />}
-    >
-      <header className="text-center">
-        <h1 className="font-display text-5xl font-black tracking-tight text-on-surface">
+    <PageShell active="leaderboard" maxWidth="max-w-lg" className="px-4" rightSlot={<PointsChip points={totalPoints} />}>
+      <header className="mb-8 text-center">
+        <h1 className="font-display text-4xl font-black italic uppercase tracking-tighter text-primary-container">
           Rankings
         </h1>
-        <p className="mt-2 text-xs font-medium uppercase tracking-widest text-on-surface-variant">
-          Circle standings
+        <div className="mx-auto mt-2 h-1 w-16 bg-primary-container" />
+        <p className="mt-3 text-xs font-medium uppercase tracking-widest text-on-surface-variant">
+          Circle standings &amp; results
         </p>
       </header>
 
-      <section className="glass-card rounded-2xl p-6">
+      <section className="glass-card rounded-lg p-6">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-xl text-primary">
-              emoji_events
-            </span>
-            <div className="font-display text-sm font-black uppercase tracking-widest text-on-surface">
-              Your circles
-            </div>
+            <span className="material-symbols-outlined text-xl text-primary-container">emoji_events</span>
+            <div className="font-display text-sm font-black uppercase tracking-widest text-on-surface">Your circles</div>
           </div>
           <Link
             href="/tournaments"
-            className="text-sm font-bold uppercase tracking-widest text-primary hover:underline"
+            className="font-display text-xs font-bold uppercase tracking-widest text-primary-container hover:underline"
           >
             Manage
           </Link>

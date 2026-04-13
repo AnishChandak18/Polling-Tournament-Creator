@@ -3,22 +3,34 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { joinWithInviteToken } from "@/services/api";
+import { joinWithCircleCode, joinWithInviteToken } from "@/services/api";
 import { Alert } from "@/components/ui/Alert";
 import BrandLogo from "@/components/branding/BrandLogo";
+import BottomNav from "@/components/navigation/BottomNav";
 
-export default function JoinClient({ token, isLoggedIn, needsOnboarding }) {
+export default function JoinClient({
+  token,
+  initialCode = "",
+  isLoggedIn,
+  needsOnboarding,
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [code, setCode] = useState(initialCode);
 
-  const joinPath = `/join?t=${encodeURIComponent(token)}`;
+  const joinPath = token
+    ? `/join?t=${encodeURIComponent(token)}`
+    : `/join${initialCode ? `?code=${encodeURIComponent(initialCode)}` : ""}`;
   const nextEncoded = encodeURIComponent(joinPath);
 
   async function handleJoin() {
     setLoading(true);
     setError(null);
     try {
-      const { tournamentId } = await joinWithInviteToken(token);
+      const payload = token
+        ? await joinWithInviteToken(token)
+        : await joinWithCircleCode(code.trim().toUpperCase());
+      const { tournamentId } = payload;
       const target = `/tournaments/${tournamentId}`;
       if (needsOnboarding) {
         window.location.href = `/onboarding?next=${encodeURIComponent(target)}`;
@@ -32,7 +44,9 @@ export default function JoinClient({ token, isLoggedIn, needsOnboarding }) {
     }
   }
 
-  const preview = token.length > 12 ? `${token.slice(0, 6)}…${token.slice(-4)}` : token;
+  const hasToken = Boolean(token);
+  const preview =
+    token.length > 12 ? `${token.slice(0, 6)}…${token.slice(-4)}` : token;
 
   return (
     <div className="min-h-screen bg-background bg-stadium-mesh text-on-surface">
@@ -59,7 +73,8 @@ export default function JoinClient({ token, isLoggedIn, needsOnboarding }) {
             <span className="text-primary-container">circle</span>
           </h1>
           <p className="mt-3 max-w-md text-sm text-on-surface-variant">
-            Synchronize with your squad. This private link grants access to the circle arena.
+            Synchronize with your squad. Join using a circle code or a private
+            invite link.
           </p>
         </div>
 
@@ -76,9 +91,18 @@ export default function JoinClient({ token, isLoggedIn, needsOnboarding }) {
               >
                 qr_code_2
               </span>
-              <p className="font-display w-full break-all text-lg font-bold uppercase tracking-wider text-on-surface">
-                {preview}
-              </p>
+              {hasToken ? (
+                <p className="font-display w-full break-all text-lg font-bold uppercase tracking-wider text-on-surface">
+                  {preview}
+                </p>
+              ) : (
+                <input
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.toUpperCase())}
+                  placeholder="ENTER CODE"
+                  className="w-full bg-transparent text-lg font-bold uppercase tracking-[0.22em] text-on-surface outline-none placeholder:text-on-surface-variant"
+                />
+              )}
             </div>
           </div>
           <div className="absolute -right-1 -top-1 h-4 w-4 border-r-2 border-t-2 border-primary/40" />
@@ -87,7 +111,9 @@ export default function JoinClient({ token, isLoggedIn, needsOnboarding }) {
 
         {!isLoggedIn ? (
           <div className="space-y-3">
-            <p className="text-sm text-on-surface-variant">Sign in to accept this invite.</p>
+            <p className="text-sm text-on-surface-variant">
+              Sign in to accept this invite.
+            </p>
             <Link
               href={`/login?next=${nextEncoded}`}
               className="btn-primary flex h-14 w-full items-center justify-center gap-2 text-sm font-black uppercase tracking-widest shadow-[0_8px_0_0_#665500]"
@@ -104,12 +130,14 @@ export default function JoinClient({ token, isLoggedIn, needsOnboarding }) {
         ) : (
           <button
             type="button"
-            disabled={loading}
+            disabled={loading || (!hasToken && !code.trim())}
             onClick={handleJoin}
             className="flex w-full items-center justify-center gap-3 bg-primary-container py-5 font-display text-xl font-black uppercase tracking-[0.15em] text-on-primary-container shadow-[0_8px_0_0_#665500] transition-all [clip-path:polygon(0_0,100%_0,100%_85%,95%_100%,0_100%)] active:translate-y-1 active:shadow-none disabled:opacity-60"
           >
             <span>{loading ? "Joining…" : "Join arena"}</span>
-            <span className="material-symbols-outlined font-bold">rocket_launch</span>
+            <span className="material-symbols-outlined font-bold">
+              rocket_launch
+            </span>
           </button>
         )}
 
@@ -122,7 +150,8 @@ export default function JoinClient({ token, isLoggedIn, needsOnboarding }) {
               Privacy protocol
             </h4>
             <p className="text-xs text-on-surface/70">
-              Circles are private; only people with the link can request to join.
+              Circles are private; only people with the link can request to
+              join.
             </p>
           </div>
           <div className="relative overflow-hidden rounded-lg border border-outline-variant bg-surface-container-low p-4">
@@ -135,25 +164,8 @@ export default function JoinClient({ token, isLoggedIn, needsOnboarding }) {
             </p>
           </div>
         </div>
-
-        <div className="relative mt-8 h-40 overflow-hidden rounded-xl border border-outline-variant/30">
-          <Image
-            src="/design/stitch-onboarding/join-private-circle.png"
-            alt=""
-            fill
-            className="object-cover opacity-50 grayscale transition-all duration-700 hover:grayscale-0"
-            sizes="(max-width: 768px) 100vw, 672px"
-            priority={false}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-          <div className="absolute bottom-4 left-4 flex items-center gap-2 text-primary">
-            <span className="material-symbols-outlined text-sm">location_on</span>
-            <span className="font-display text-[10px] font-bold uppercase tracking-tighter">
-              Global arena access
-            </span>
-          </div>
-        </div>
       </main>
+      <BottomNav active="circles" />
     </div>
   );
 }

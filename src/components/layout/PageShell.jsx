@@ -14,11 +14,11 @@ export default function PageShell({
   children,
 }) {
   return (
-    <div className="min-h-screen bg-background bg-stadium-mesh pb-28">
+    <div className="min-h-screen bg-background pb-28">
       <TopBar rightSlot={rightSlot} />
 
       <main
-        className={["mx-auto space-y-8 px-6 pb-32 pt-24", maxWidth, className].join(" ")}
+        className={["mx-auto space-y-8 bg-stadium-mesh px-4 pb-32 pt-24 sm:px-6", maxWidth, className].join(" ")}
       >
         {children}
       </main>

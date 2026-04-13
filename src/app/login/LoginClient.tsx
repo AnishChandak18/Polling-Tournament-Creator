@@ -8,6 +8,8 @@ import { getAuthCallbackUrl, setAuthRedirectCookie } from "@/lib/auth-browser";
 import { safeNextPath } from "@/lib/auth-redirect";
 import AuthStitchLayout from "@/components/auth/AuthStitchLayout";
 import GoogleGlyph from "@/components/auth/GoogleGlyph";
+import StadiumGlowPanel from "@/components/stadium/StadiumGlowPanel";
+import StadiumSectionLabel from "@/components/stadium/StadiumSectionLabel";
 import { Alert } from "@/components/ui/Alert";
 import { Input } from "@/components/ui/input";
 
@@ -75,111 +77,126 @@ export default function LoginClient() {
 
   return (
     <AuthStitchLayout>
-      <div className="relative w-full max-w-md border border-outline-variant bg-surface-container/80 p-8 shadow-2xl backdrop-blur-xl">
-        <div className="absolute -left-[1px] -top-[1px] h-8 w-8 border-l-2 border-t-2 border-primary" />
-        <div className="absolute -bottom-[1px] -right-[1px] h-8 w-8 border-b-2 border-r-2 border-primary" />
-
-        <div className="mb-10 text-center">
-          <h2 className="font-display text-4xl font-black uppercase tracking-tighter text-on-surface">
+      <div className="w-full max-w-md">
+        <StadiumSectionLabel kicker="Access Protocol">
+          <h1 className="font-display text-4xl font-bold uppercase tracking-tighter text-on-surface">
             Welcome Back
-          </h2>
-          <p className="mt-2 text-sm font-medium tracking-wide text-on-surface-variant">
-            Enter your credentials to access the grid.
-          </p>
-        </div>
+          </h1>
+          <p className="mt-1 text-sm font-medium text-zinc-500">Sign in to your account</p>
+        </StadiumSectionLabel>
 
-        <form className="space-y-6" onSubmit={signInWithPassword}>
-          <div className="space-y-2">
-            <label
-              className="block text-[10px] font-bold uppercase tracking-widest text-primary"
-              htmlFor="login-email"
-            >
-              Tactical Email ID
-            </label>
-            <div className="group relative">
-              <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg text-outline transition-colors group-focus-within:text-primary">
-                alternate_email
-              </span>
-              <Input
-                id="login-email"
-                type="email"
-                autoComplete="email"
-                placeholder="OPERATOR@STADIUM.PULSE"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="rounded-none border-outline-variant bg-surface-container-high py-3 pl-10 pr-4 text-sm placeholder:uppercase placeholder:text-outline-variant focus-visible:border-primary focus-visible:ring-primary"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
+        <StadiumGlowPanel className="mt-8">
+          <form className="space-y-6" onSubmit={signInWithPassword}>
+            <div className="space-y-2">
               <label
-                className="text-[10px] font-bold uppercase tracking-widest text-primary"
-                htmlFor="login-password"
+                className="ml-1 font-display text-[10px] font-bold uppercase tracking-widest text-zinc-400"
+                htmlFor="login-email"
               >
-                Encryption Key
+                Email Address
               </label>
-              <Link
-                href="/forgot-password"
-                className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant transition-colors hover:text-primary"
-              >
-                Forgot Access?
-              </Link>
+              <div className="group relative">
+                <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg text-zinc-600 transition-colors group-focus-within:text-primary-container">
+                  alternate_email
+                </span>
+                <Input
+                  id="login-email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="user@stadiumpulse.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-none border-2 border-zinc-800 bg-zinc-950 py-3 pl-10 pr-4 font-medium text-on-surface placeholder:text-zinc-700 focus-visible:border-primary-container focus-visible:ring-0"
+                />
+              </div>
             </div>
-            <div className="group relative">
-              <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg text-outline transition-colors group-focus-within:text-primary">
-                lock
-              </span>
-              <Input
-                id="login-password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="••••••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="rounded-none border-outline-variant bg-surface-container-high py-3 pl-10 pr-4 text-sm placeholder:text-outline-variant focus-visible:border-primary focus-visible:ring-primary"
-              />
+
+            <div className="space-y-2">
+              <div className="flex items-end justify-between">
+                <label
+                  className="ml-1 font-display text-[10px] font-bold uppercase tracking-widest text-zinc-400"
+                  htmlFor="login-password"
+                >
+                  Password
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="font-display text-[10px] font-bold uppercase tracking-widest text-primary transition-colors hover:text-on-surface"
+                >
+                  Recover?
+                </Link>
+              </div>
+              <div className="group relative">
+                <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg text-zinc-600 transition-colors group-focus-within:text-primary-container">
+                  lock
+                </span>
+                <Input
+                  id="login-password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="••••••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-none border-2 border-zinc-800 bg-zinc-950 py-3 pl-10 pr-4 font-medium text-on-surface placeholder:text-zinc-700 focus-visible:border-primary-container focus-visible:ring-0"
+                />
+              </div>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={pwdLoading}
-            className="btn-primary w-full py-4 text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(255,215,9,0.2)]"
-          >
-            {pwdLoading ? "Signing in..." : "Initiate Login"}
-          </button>
-
-          <div className="relative flex items-center py-2">
-            <div className="flex-grow border-t border-outline-variant" />
-            <span className="mx-4 flex-shrink text-[10px] font-black uppercase tracking-tighter text-outline">
-              Secure Link Protocol
-            </span>
-            <div className="flex-grow border-t border-outline-variant" />
-          </div>
-
-          <button
-            type="button"
-            onClick={signInWithGoogle}
-            disabled={oauthLoading}
-            className="flex w-full items-center justify-center gap-3 border border-outline-variant bg-surface-container-highest py-4 text-xs font-bold uppercase tracking-widest text-on-surface transition-all hover:bg-surface-bright active:scale-[0.98] disabled:opacity-60"
-          >
-            <GoogleGlyph />
-            {oauthLoading ? "Opening Google..." : "Sign in with Google"}
-          </button>
-        </form>
-
-        <div className="mt-8 text-center">
-          <p className="text-xs font-medium uppercase tracking-wide text-on-surface-variant">
-            New to the Stadium?{" "}
-            <Link
-              href={next === "/dashboard" ? "/signup" : `/signup?next=${encodeURIComponent(next)}`}
-              className="ml-1 font-black text-primary underline-offset-4 hover:underline"
+            <button
+              type="submit"
+              disabled={pwdLoading}
+              className="group flex w-full items-center justify-center gap-2 bg-primary-container py-4 font-display text-on-primary-container transition-transform duration-100 active:scale-95 disabled:opacity-60"
             >
-              Create an account
-            </Link>
-          </p>
+              <span className="font-black uppercase tracking-[0.15em]">{pwdLoading ? "Signing in..." : "Sign In"}</span>
+              <span className="material-symbols-outlined text-xl transition-transform group-hover:translate-x-1">login</span>
+            </button>
+
+            <div className="relative flex items-center py-2">
+              <div className="flex-grow border-t border-zinc-800" />
+              <span className="mx-4 flex-shrink font-display text-[10px] font-bold uppercase tracking-widest text-zinc-600">
+                OR
+              </span>
+              <div className="flex-grow border-t border-zinc-800" />
+            </div>
+
+            <button
+              type="button"
+              onClick={signInWithGoogle}
+              disabled={oauthLoading}
+              className="flex w-full items-center justify-center gap-3 border border-zinc-700 bg-zinc-900 py-3 font-display text-xs font-bold uppercase tracking-widest text-on-surface transition-colors hover:bg-zinc-800 disabled:opacity-60"
+            >
+              <GoogleGlyph className="h-5 w-5 shrink-0 grayscale transition-all hover:grayscale-0" />
+              {oauthLoading ? "Opening Google..." : "Sign in with Google"}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-xs font-medium text-zinc-500">
+              New operator?{" "}
+              <Link
+                href={next === "/dashboard" ? "/signup" : `/signup?next=${encodeURIComponent(next)}`}
+                className="ml-1 font-bold text-primary-container hover:underline"
+              >
+                Create an Account
+              </Link>
+            </p>
+          </div>
+        </StadiumGlowPanel>
+
+        <div className="mt-8 grid grid-cols-2 gap-4">
+          <div className="border-l-2 border-primary-container bg-zinc-900/40 p-3">
+            <p className="mb-1 font-display text-[8px] uppercase tracking-widest text-zinc-500">Session Integrity</p>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+              <span className="font-display text-[10px] font-bold text-zinc-300">SECURE_LINK_ACTIVE</span>
+            </div>
+          </div>
+          <div className="border-l-2 border-zinc-700 bg-zinc-900/40 p-3">
+            <p className="mb-1 font-display text-[8px] uppercase tracking-widest text-zinc-500">Verification</p>
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[14px] text-zinc-400">shield</span>
+              <span className="font-display text-[10px] font-bold text-zinc-300">MFA_READY</span>
+            </div>
+          </div>
         </div>
 
         {error ? (

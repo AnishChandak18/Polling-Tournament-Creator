@@ -1,40 +1,32 @@
 "use client";
 
-import Link from "next/link";
+import BottomNav from "@/components/navigation/BottomNav";
+import BrandLogo from "@/components/branding/BrandLogo";
 
 /**
- * Shared shell for Stitch auth screens: black top bar, gold accent, kinetic grid.
+ * Shared shell for Stitch auth screens: tactical header, gold accent, kinetic grid.
  */
 export default function AuthStitchLayout({ children }) {
   return (
     <div className="min-h-screen bg-background text-on-surface selection:bg-primary selection:text-on-primary">
-      <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-between border-b-2 border-primary-container/20 bg-black px-6 shadow-[0_0_15px_rgba(255,215,0,0.1)]">
-        <Link href="/" className="flex min-w-0 items-center gap-2">
-          <span className="material-symbols-outlined shrink-0 text-2xl text-primary-container">
-            sports_cricket
+      <header className="fixed top-0 z-50 flex h-20 w-full items-center justify-between border-b border-zinc-800/50 bg-zinc-950/40 px-6 backdrop-blur-xl">
+        <BrandLogo href="/" />
+        <div className="hidden items-center gap-4 md:flex">
+          <span className="font-display text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+            System Status: <span className="text-emerald-500">Nominal</span>
           </span>
-          <span className="font-display truncate text-lg font-black uppercase italic tracking-widest text-primary-container sm:text-xl">
-            Stadium Pulse
-          </span>
-        </Link>
-        <div className="hidden shrink-0 gap-6 md:flex">
-          <Link
-            href="/"
-            className="font-display text-xs font-bold uppercase tracking-widest text-zinc-500 transition-colors hover:text-primary-container"
-          >
-            Home
-          </Link>
         </div>
       </header>
 
-      <main className="relative min-h-screen overflow-hidden pt-16">
-        <div className="pointer-events-none absolute inset-0 kinetic-grid opacity-90" />
-        <div className="pointer-events-none absolute top-1/4 -left-20 h-96 w-96 rounded-full bg-primary/10 blur-[120px]" />
-        <div className="pointer-events-none absolute bottom-1/4 -right-20 h-96 w-96 rounded-full bg-secondary/10 blur-[120px]" />
-        <div className="relative z-10 flex min-h-[calc(100dvh-4rem)] flex-col items-center justify-center p-4 pb-12">
+      <main className="relative min-h-screen overflow-hidden pb-28 pt-20">
+        <div className="pointer-events-none absolute inset-0 bg-stadium-mesh opacity-90" />
+        <div className="pointer-events-none absolute -left-20 top-1/4 h-96 w-96 rounded-full bg-primary/10 blur-[120px]" />
+        <div className="pointer-events-none absolute -right-20 bottom-1/4 h-96 w-96 rounded-full bg-secondary/10 blur-[120px]" />
+        <div className="relative z-10 flex min-h-[calc(100dvh-5rem)] flex-col items-center justify-center p-4 pb-12">
           {children}
         </div>
       </main>
+      <BottomNav active="home" />
     </div>
   );
 }

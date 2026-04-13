@@ -52,6 +52,8 @@ model Tournament {
   type      TournamentType   @default(IPL)
   status    TournamentStatus @default(UPCOMING)
   ownerId   String
+  /// Human-friendly circle code users can type on `/join`.
+  joinCode              String    @unique
   /// Opaque invite token for `/join?t=...` (rotated by owner).
   inviteToken           String?   @unique
   inviteTokenCreatedAt  DateTime?

@@ -4,6 +4,7 @@ import { recalculateTournamentScores } from "@/lib/leaderboard";
 import { HttpError } from "@/services/server/api/errors";
 import { upsertIplFixturesForTournament } from "@/services/server/api/sync";
 import { isUserFixtureSyncFresh } from "@/services/server/fixture-sync";
+import { generateUniqueJoinCode } from "@/services/server/circle-invite";
 
 export async function listTournamentsForCurrentUser() {
   const user = await getCurrentUserOrThrow();
@@ -39,11 +40,13 @@ export async function createTournamentForCurrentUser(input: {
     throw new HttpError("name is required", 400);
   }
 
+  const joinCode = await generateUniqueJoinCode();
   const tournament = await prisma.tournament.create({
     data: {
       name,
       season,
       ownerId: user.id,
+      joinCode,
       members: {
         create: { userId: user.id },
       },

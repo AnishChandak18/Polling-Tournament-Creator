@@ -48,13 +48,13 @@ export async function getTournament(tournamentId: string) {
 }
 
 export async function getTournamentInvite(tournamentId: string) {
-  return apiRequest<{ inviteUrl: string | null }>(
+  return apiRequest<{ inviteUrl: string | null; joinCode: string }>(
     `/api/tournaments/${tournamentId}/invite`
   );
 }
 
 export async function rotateTournamentInvite(tournamentId: string) {
-  return apiRequest<{ inviteUrl: string }>(`/api/tournaments/${tournamentId}/invite`, {
+  return apiRequest<{ inviteUrl: string; joinCode: string }>(`/api/tournaments/${tournamentId}/invite`, {
     method: "POST",
   });
 }
