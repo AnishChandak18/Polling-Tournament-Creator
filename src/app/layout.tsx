@@ -29,6 +29,10 @@ const plusJakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Stadium Pulse",
   description: "IPL predictions, circles, and rankings.",
+  icons: {
+    icon: "/stadium-pulse-favicon.png",
+    apple: "/stadium-pulse-favicon.png",
+  },
 };
 
 export default function RootLayout({
