@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/FormField";
@@ -7,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/Alert";
 import BackButton from "@/components/common/BackButton";
 import { createTournament } from "@/services/api";
+import { navigateSpa } from "@/lib/client-navigation";
 
 export default function CreateTournamentPage() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [season, setSeason] = useState("2026");
   const [saving, setSaving] = useState(false);
@@ -21,7 +24,7 @@ export default function CreateTournamentPage() {
 
     try {
       const json = await createTournament({ name, season });
-      window.location.href = `/tournaments/${json.tournamentId}`;
+      await navigateSpa(router, `/tournaments/${json.tournamentId}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error");
       setSaving(false);

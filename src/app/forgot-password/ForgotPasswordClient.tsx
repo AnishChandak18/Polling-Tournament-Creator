@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { getAuthCallbackUrl, setAuthRedirectCookie } from "@/lib/auth-browser";
@@ -12,15 +13,15 @@ const DB_ERROR_MSG =
   "Database connection failed. Check DATABASE_URL in .env.local (use your Supabase database password, not the anon key).";
 
 export default function ForgotPasswordClient() {
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("error") === "database") setError(DB_ERROR_MSG);
-  }, []);
+    if (searchParams.get("error") === "database") setError(DB_ERROR_MSG);
+  }, [searchParams]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();

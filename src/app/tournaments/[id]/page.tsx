@@ -1,25 +1,22 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import PageShell from "@/components/layout/PageShell";
-import PointsChip from "@/components/ui/PointsChip";
-import MatchVoteCard from "@/components/voting/MatchVoteCard";
-import BackButton from "@/components/common/BackButton";
-import InviteToCircleClient from "@/components/circles/InviteToCircleClient";
-import LiveMatchViewClient from "@/components/matches/LiveMatchViewClient";
+import { redirect } from "next/navigation";
 import {
   getAuthContext,
   getTournamentWithMatchesForUser,
+  getTournamentMemberCount,
+  getTournamentLeaderboardForUser,
   getUserPointsChipTotal,
+  getUserRankInTournament,
   scheduleFixtureSyncForUser,
 } from "@/services/server";
-import { asMatchDisplayMeta, groupMatchesByScheduleDay } from "@/lib/match-display";
-
-function isTodayUtc(date: Date) {
-  const now = new Date();
-  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
-  return date >= start && date < end;
-}
+import { asMatchDisplayMeta } from "@/lib/match-display";
+import { canVoteOnMatch } from "@/lib/vote-window";
+import CircleArenaTopBar from "@/components/circle-arena/CircleArenaTopBar";
+import CircleArenaBottomNav from "@/components/circle-arena/CircleArenaBottomNav";
+import CircleArenaNav from "@/components/circle-arena/CircleArenaNav";
+import CircleArenaMatchCard from "@/components/circle-arena/CircleArenaMatchCard";
+import CircleArenaLeaderboard from "@/components/circle-arena/CircleArenaLeaderboard";
+import CircleArenaInvite from "@/components/circle-arena/CircleArenaInvite";
 
 export default async function TournamentDetailPage({
   params,
@@ -31,118 +28,112 @@ export default async function TournamentDetailPage({
   if (!dbUser) redirect("/login?error=database");
 
   const { id: tournamentId } = await params;
-  const [tournament, totalPoints] = await Promise.all([
+  const [tournament, totalPoints, memberCount, leaderboardData, userRank] = await Promise.all([
     getTournamentWithMatchesForUser(tournamentId, dbUser.id),
     getUserPointsChipTotal(dbUser.id),
+    getTournamentMemberCount(tournamentId),
+    getTournamentLeaderboardForUser(tournamentId, dbUser.id),
+    getUserRankInTournament(dbUser.id, tournamentId),
   ]);
 
   if (!tournament) redirect("/tournaments");
 
   await scheduleFixtureSyncForUser(dbUser.id);
 
-  const visibleMatches = tournament.matches.filter((m) => m.status !== "COMPLETED");
-  const scheduleGroups = groupMatchesByScheduleDay(visibleMatches);
+  const visibleMatches = tournament.matches
+    .filter((m) => m.status !== "COMPLETED")
+    .sort((a, b) => a.matchDate.getTime() - b.matchDate.getTime());
+
   const isOwner = tournament.ownerId === dbUser.id;
-  const liveMatch =
-    visibleMatches.find((m) => m.status === "LIVE") ??
-    visibleMatches.find((m) => m.status === "UPCOMING");
+
+  const leaderboardTop = (leaderboardData?.leaderboard ?? []).slice(0, 3).map((row, i) => ({
+    rank: i + 1,
+    displayName: row.user.name?.trim() || row.user.email?.split("@")[0] || "Player",
+    score: row.score,
+    avatarUrl: row.user.avatarUrl,
+  }));
+
+  const circleIdLabel = `#${tournament.id.replace(/[^a-z0-9]/gi, "").slice(0, 8).toUpperCase()}`;
+  const liveMatch = tournament.matches.find((m) => m.status === "LIVE");
 
   return (
-    <PageShell active="circles" maxWidth="max-w-5xl" className="px-4" rightSlot={<PointsChip points={totalPoints} />}>
-      <BackButton fallbackHref="/tournaments" className="mb-2" />
+    <div className="min-h-[max(884px,100dvh)] bg-background font-body text-on-background selection:bg-primary selection:text-on-primary">
+      <CircleArenaTopBar
+        avatarUrl={dbUser.avatarUrl}
+        points={totalPoints}
+        userName={dbUser.name ?? dbUser.email ?? "?"}
+      />
 
-      <section className="relative overflow-hidden rounded-xl border border-zinc-800 bg-surface-container p-6 sm:p-8">
-        <div className="pointer-events-none absolute inset-0 hud-scanline-light opacity-30" />
-        <div className="relative z-10 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="font-display text-xs font-black uppercase tracking-[0.2em] text-primary-container">
-              Circle Arena
+      <main className="mx-auto max-w-5xl px-4 pb-24 pt-20 kinetic-grid">
+        <section className="relative mb-8">
+          <div className="absolute -left-4 top-0 h-16 w-1 bg-primary" aria-hidden />
+          <div className="pl-4">
+            <div className="mb-1 flex items-center gap-2">
+              <span className="border border-primary/20 bg-primary/10 px-2 py-0.5 font-headline text-[10px] font-bold uppercase tracking-widest text-primary">
+                Active Circle
+              </span>
+              <span className="font-headline text-[10px] font-medium uppercase tracking-widest text-zinc-500">
+                ID: {circleIdLabel}
+              </span>
             </div>
-            <h1 className="font-display mt-2 text-4xl font-black uppercase italic tracking-tighter text-on-surface">
+            <h2 className="font-headline text-4xl font-black uppercase italic tracking-tighter text-on-background">
               {tournament.name}
-            </h1>
-            <p className="mt-1 text-on-surface-variant">IPL {tournament.season}</p>
+            </h2>
+            <p className="mt-1 flex items-center gap-2 text-sm text-zinc-500">
+              <span className="material-symbols-outlined text-sm">group</span>
+              {memberCount} Members active in this hub
+            </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Link className="btn-primary h-10 px-4 text-xs" href={`/tournaments/${tournament.id}/vote`}>
-              Vote
-            </Link>
-            <Link
-              className="inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:border-primary-container"
-              href={`/tournaments/${tournament.id}/leaderboard`}
-            >
-              Leaderboard
-            </Link>
-            <Link
-              className="inline-flex items-center rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:border-primary-container"
-              href={`/tournaments/${tournament.id}/history`}
-            >
-              History
-            </Link>
-          </div>
-        </div>
+        </section>
 
-        <div className="relative z-10 mt-6 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
-            <div className="text-xs uppercase tracking-wider text-zinc-500">Total Matches</div>
-            <div className="mt-1 font-display text-2xl font-black text-on-surface">{visibleMatches.length}</div>
-          </div>
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
-            <div className="text-xs uppercase tracking-wider text-zinc-500">Open Today</div>
-            <div className="mt-1 font-display text-2xl font-black text-on-surface">
-              {visibleMatches.filter((m) => m.status === "UPCOMING" && isTodayUtc(m.matchDate)).length}
+        <CircleArenaNav tournamentId={tournament.id} hasLive={!!liveMatch} />
+
+        {liveMatch ? (
+          <Link
+            href={`/tournaments/${tournament.id}/live`}
+            className="mb-6 flex items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/10 px-4 py-3 font-headline text-sm font-bold uppercase tracking-wider text-primary transition-colors hover:bg-primary/20"
+          >
+            <span className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
+              </span>
+              Live match in progress — open arena
+            </span>
+            <span className="material-symbols-outlined">chevron_right</span>
+          </Link>
+        ) : null}
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {visibleMatches.length === 0 ? (
+            <div className="col-span-full border border-zinc-800 bg-zinc-900/50 p-8 text-center text-zinc-500">
+              No fixtures available for this season yet.
             </div>
-          </div>
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
-            <div className="text-xs uppercase tracking-wider text-zinc-500">Completed</div>
-            <div className="mt-1 font-display text-2xl font-black text-on-surface">
-              {tournament.matches.filter((m) => m.status === "COMPLETED").length}
-            </div>
-          </div>
+          ) : (
+            visibleMatches.map((m) => (
+              <CircleArenaMatchCard
+                key={m.id}
+                match={{
+                  id: m.id,
+                  team1: m.team1,
+                  team2: m.team2,
+                  matchDate: m.matchDate.toISOString(),
+                  venue: m.venue,
+                  status: m.status,
+                }}
+                displayMeta={asMatchDisplayMeta(m.displayMeta)}
+                canVote={canVoteOnMatch(m.matchDate, m.status)}
+              />
+            ))
+          )}
         </div>
 
-        <div className="relative z-10 mt-6">
-          <InviteToCircleClient tournamentId={tournament.id} isOwner={isOwner} />
-        </div>
-        {liveMatch ? <LiveMatchViewClient matchId={liveMatch.id} /> : null}
+        <CircleArenaLeaderboard tournamentId={tournament.id} userRank={userRank} rows={leaderboardTop} />
 
-        <div className="relative z-10 mt-6 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/50">
-          <div className="border-b border-zinc-800 p-4 font-display text-sm font-black uppercase tracking-wider text-on-surface">
-            Matches
-          </div>
-          <div className="divide-y divide-zinc-800/80">
-            {visibleMatches.length === 0 ? (
-              <div className="p-4 text-on-surface-variant">No fixtures available for this season yet.</div>
-            ) : (
-              scheduleGroups.map(({ label, matches }) => (
-                <div key={label}>
-                  <div className="border-b border-zinc-800 bg-zinc-900/50 px-4 py-2 text-xs font-black uppercase tracking-widest text-primary-container">
-                    {label}
-                  </div>
-                  <div className="divide-y divide-zinc-800/80">
-                    {matches.map((m) => (
-                      <MatchVoteCard
-                        key={m.id}
-                        match={{
-                          id: m.id,
-                          team1: m.team1,
-                          team2: m.team2,
-                          matchDate: m.matchDate.toISOString(),
-                          venue: m.venue,
-                          status: m.status,
-                          displayMeta: asMatchDisplayMeta(m.displayMeta),
-                        }}
-                        existingVoteTeam={m.votes?.[0]?.teamVoted ?? null}
-                        canVote={m.status === "UPCOMING" && isTodayUtc(m.matchDate)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </section>
-    </PageShell>
+        <CircleArenaInvite tournamentId={tournament.id} isOwner={isOwner} />
+      </main>
+
+      <CircleArenaBottomNav active="circles" />
+    </div>
   );
 }

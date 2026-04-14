@@ -1,14 +1,18 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { replaceSpa } from "@/lib/client-navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function SignOutButton({ className = "" }: { className?: string }) {
+  const router = useRouter();
+
   async function signOut() {
     const supabase = createSupabaseBrowserClient();
     await supabase.auth.signOut();
-    window.location.href = "/";
+    await replaceSpa(router, "/");
   }
 
   return (

@@ -1,5 +1,6 @@
 import rawSchedule from "@/data/ipl-schedule.json";
 import { fetchJsonFromRapidApi, getRapidApiScheduleConfig } from "@/lib/ipl-rapidapi";
+import { extractCandidates } from "@/lib/ipl-payload";
 import type { MatchDisplayMeta } from "@/lib/match-display";
 
 export type { MatchDisplayMeta } from "@/lib/match-display";
@@ -125,49 +126,34 @@ function buildDisplayMeta(raw: RawFixture): MatchDisplayMeta | null {
   return Object.keys(meta).length > 0 ? meta : null;
 }
 
-function extractCandidates(payload: unknown): unknown[] | null {
-  if (Array.isArray(payload)) return payload;
-
-  if (!payload || typeof payload !== "object") return null;
-  const root = payload as Record<string, unknown>;
-
-  const nested =
-    (root.fixtures as unknown[] | undefined) ??
-    (root.schedule as unknown[] | undefined) ??
-    (root.Matchsummary as unknown[] | undefined) ??
-    (root.matches as unknown[] | undefined) ??
-    (root.matchList as unknown[] | undefined) ??
-    (root.data as unknown[] | undefined);
-
-  if (Array.isArray(nested)) return nested;
-
-  const dataObj = root.data as Record<string, unknown> | undefined;
-  if (dataObj && typeof dataObj === "object") {
-    const fromData =
-      (dataObj.matchList as unknown[] | undefined) ??
-      (dataObj.matches as unknown[] | undefined) ??
-      (dataObj.fixtures as unknown[] | undefined) ??
-      (dataObj.schedule as unknown[] | undefined);
-    if (Array.isArray(fromData)) return fromData;
+function seriesLabelFromRaw(raw: RawFixture): string {
+  const direct = pickString(raw, ["seriesName", "series_name"]);
+  if (direct) return direct;
+  const ser = raw.series;
+  if (ser && typeof ser === "object") {
+    return (
+      pickString(ser as Record<string, unknown>, ["name", "longName", "seriesName"]) ?? ""
+    );
   }
+  return "";
+}
 
-  const apiResults = root.apiResults as Record<string, unknown> | undefined;
-  if (apiResults?.data && Array.isArray(apiResults.data)) {
-    return apiResults.data as unknown[];
+/** Flat list / new Cricbuzz Cricket API shapes (e.g. /schedule/v1/league). */
+function parseIplFixturesFromFlatCandidates(json: unknown, wantIpl: number | null): IplFixture[] {
+  const candidates = extractCandidates(json);
+  if (!candidates) return [];
+  const fixtures: IplFixture[] = [];
+  for (const raw of candidates as RawFixture[]) {
+    const seriesName = seriesLabelFromRaw(raw);
+    const seriesIdRaw = pickString(raw, ["seriesId", "series_id"]);
+    const shouldInclude =
+      seriesName.toLowerCase().includes("indian premier league") ||
+      (wantIpl !== null && seriesIdRaw !== null && Number(seriesIdRaw) === wantIpl);
+    if (!shouldInclude) continue;
+    const fixture = parseFixture(raw);
+    if (fixture) fixtures.push(fixture);
   }
-
-  const arrayValues = Object.values(root).filter(
-    (v): v is unknown[] => Array.isArray(v) && v.length > 0
-  );
-  if (arrayValues.length === 1) {
-    return arrayValues[0];
-  }
-  if (arrayValues.length > 1) {
-    const longest = arrayValues.reduce((a, b) => (a.length >= b.length ? a : b));
-    return longest;
-  }
-
-  return null;
+  return fixtures;
 }
 
 function parseFixture(raw: RawFixture): IplFixture | null {
@@ -330,8 +316,8 @@ export async function fetchIplFixturesFromRapidApi(): Promise<IplFixture[] | nul
 
   const json = await fetchJsonFromRapidApi(cfg.scheduleUrl, cfg.key);
 
-  // Shape for `free-cricbuzz-cricket-api` (/cricket-schedule-league):
-  // { response: { schedules: [ { scheduleAdWrapper: { matchScheduleList: [{ seriesName, matchInfo: [...] }]}}]}}
+  // Legacy nested shape (older Free Cricbuzz API): schedules[].scheduleAdWrapper.matchScheduleList[].matchInfo[]
+  // New "Cricbuzz Cricket" API: often flat match lists under response/data (see parseIplFixturesFromFlatCandidates).
   const root = json as Record<string, unknown>;
   const inner =
     root?.response && typeof root.response === "object"
@@ -395,12 +381,27 @@ export async function fetchIplFixturesFromRapidApi(): Promise<IplFixture[] | nul
       }
     }
 
-    return fixtures.length ? fixtures : null;
+    if (fixtures.length) return fixtures;
+  }
+
+  const tryRoots = [
+    json,
+    (json as Record<string, unknown>).response,
+    (json as Record<string, unknown>).data,
+  ];
+  for (const root of tryRoots) {
+    if (root == null || typeof root !== "object") continue;
+    const fromFlat = parseIplFixturesFromFlatCandidates(root, wantIpl);
+    if (fromFlat.length) return fromFlat;
   }
 
   // Fallback: try generic extraction for other provider shapes.
-  const list = fixturesFromPayload(json);
-  return list.length ? list : null;
+  try {
+    const list = fixturesFromPayload(json);
+    return list.length ? list : null;
+  } catch {
+    return null;
+  }
 }
 
 /**

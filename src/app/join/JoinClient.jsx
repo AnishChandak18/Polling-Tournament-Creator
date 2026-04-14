@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { joinWithCircleCode, joinWithInviteToken } from "@/services/api";
 import { Alert } from "@/components/ui/Alert";
 import BrandLogo from "@/components/branding/BrandLogo";
 import BottomNav from "@/components/navigation/BottomNav";
+import { navigateSpa } from "@/lib/client-navigation";
 
 export default function JoinClient({
   token,
@@ -14,6 +16,7 @@ export default function JoinClient({
   isLoggedIn,
   needsOnboarding,
 }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [code, setCode] = useState(initialCode);
@@ -33,9 +36,9 @@ export default function JoinClient({
       const { tournamentId } = payload;
       const target = `/tournaments/${tournamentId}`;
       if (needsOnboarding) {
-        window.location.href = `/onboarding?next=${encodeURIComponent(target)}`;
+        await navigateSpa(router, `/onboarding?next=${encodeURIComponent(target)}`);
       } else {
-        window.location.href = target;
+        await navigateSpa(router, target);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not join circle");

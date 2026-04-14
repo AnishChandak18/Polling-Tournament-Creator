@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import PageShell from "@/components/layout/PageShell";
 import PointsChip from "@/components/ui/PointsChip";
@@ -10,8 +10,10 @@ import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/Alert";
 import { patchMe } from "@/services/api";
+import { navigateSpa } from "@/lib/client-navigation";
 
 export default function OnboardingClient({ initialUsername, initialName, points = 0 }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/dashboard";
   const [username, setUsername] = useState(initialUsername ?? "");
@@ -35,7 +37,7 @@ export default function OnboardingClient({ initialUsername, initialName, points 
         onboardingComplete: true,
       });
       const path = next.startsWith("/") ? next : `/${next}`;
-      window.location.href = path;
+      await navigateSpa(router, path);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save profile");
     } finally {

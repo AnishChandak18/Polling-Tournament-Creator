@@ -9,6 +9,16 @@ function shortTeam(name) {
 
 /**
  * Stitch Home — "Live Now" match spotlight (mobile canvas).
+ *
+ * @param {object} props
+ * @param {string} props.team1
+ * @param {string} props.team2
+ * @param {Date} props.matchDate
+ * @param {string} props.season
+ * @param {boolean} props.isLiveDay
+ * @param {string} props.predictHref
+ * @param {string | null} [props.liveArenaHref]
+ * @param {boolean} [props.isMatchLive]
  */
 export default function DashboardLiveCard({
   team1,
@@ -17,6 +27,8 @@ export default function DashboardLiveCard({
   season,
   isLiveDay,
   predictHref,
+  liveArenaHref = null,
+  isMatchLive = false,
 }) {
   const t1 = shortTeam(team1);
   const t2 = shortTeam(team2);
@@ -92,13 +104,23 @@ export default function DashboardLiveCard({
               <span>Start · {timeLabel} IST</span>
               <span>IPL {season}</span>
             </div>
-            <Link
-              href={predictHref}
-              className="btn-primary pulse-shadow flex h-14 w-full items-center justify-center gap-2 py-4 text-sm uppercase tracking-widest"
-            >
-              <span className="material-symbols-outlined text-xl">query_stats</span>
-              Predict Now
-            </Link>
+            {isMatchLive && liveArenaHref ? (
+              <Link
+                href={liveArenaHref}
+                className="btn-primary pulse-shadow flex h-14 w-full items-center justify-center gap-2 py-4 text-sm uppercase tracking-widest"
+              >
+                <span className="material-symbols-outlined text-xl">sensors</span>
+                Enter live arena
+              </Link>
+            ) : (
+              <Link
+                href={predictHref}
+                className="btn-primary pulse-shadow flex h-14 w-full items-center justify-center gap-2 py-4 text-sm uppercase tracking-widest"
+              >
+                <span className="material-symbols-outlined text-xl">query_stats</span>
+                Predict Now
+              </Link>
+            )}
           </div>
         </div>
         <div className="pointer-events-none absolute -bottom-10 -right-10 h-32 w-32 rounded-full bg-yellow-400/5 blur-3xl" />

@@ -1,21 +1,7 @@
 import { prisma } from "@/lib/prisma";
+import { getVoteLockDeadline } from "@/lib/vote-window";
 import { getCurrentUserOrThrow } from "@/lib/currentUser";
 import { HttpError } from "@/services/server/api/errors";
-
-const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-
-function isTodayIst(date: Date) {
-  const now = new Date();
-  const shifted = new Date(now.getTime() + IST_OFFSET_MS);
-  const startShifted = Date.UTC(
-    shifted.getUTCFullYear(),
-    shifted.getUTCMonth(),
-    shifted.getUTCDate()
-  );
-  const start = new Date(startShifted - IST_OFFSET_MS);
-  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-  return date >= start && date < end;
-}
 
 export async function createVoteForCurrentUser(input: {
   matchId?: string;
@@ -40,18 +26,28 @@ export async function createVoteForCurrentUser(input: {
     throw new HttpError("Voting is closed for this match", 400);
   }
 
-  if (!isTodayIst(match.matchDate)) {
-    throw new HttpError("Voting is only allowed on match day", 400);
+  const lockDeadline = getVoteLockDeadline(match.matchDate);
+  if (Date.now() >= lockDeadline.getTime()) {
+    throw new HttpError("Voting closed — lock is 30 minutes before kickoff", 400);
   }
 
   if (![match.team1, match.team2].includes(teamVoted)) {
     throw new HttpError("Invalid team selection", 400);
   }
 
-  const vote = await prisma.vote.create({
-    data: {
+  const vote = await prisma.vote.upsert({
+    where: {
+      matchId_userId: {
+        matchId: match.id,
+        userId: user.id,
+      },
+    },
+    create: {
       matchId: match.id,
       userId: user.id,
+      teamVoted,
+    },
+    update: {
       teamVoted,
     },
     select: { id: true },

@@ -14,6 +14,18 @@ type ApiRequestOptions = {
   headers?: Record<string, string>;
 };
 
+function logDevToolsApiResponse(
+  method: string,
+  path: string,
+  status: number,
+  ok: boolean,
+  body: unknown
+) {
+  if (process.env.NODE_ENV !== "production" && typeof window !== "undefined") {
+    console.log("[api response]", { method, path, status, ok, body });
+  }
+}
+
 export async function apiRequest<T>(
   path: string,
   { method = "GET", body, headers = {} }: ApiRequestOptions = {}
@@ -28,6 +40,8 @@ export async function apiRequest<T>(
   });
 
   const json = await res.json().catch(() => ({}));
+  logDevToolsApiResponse(method, path, res.status, res.ok, json);
+
   if (!res.ok) {
     const message =
       typeof json?.error === "string" && json.error.length > 0

@@ -33,7 +33,9 @@ const config: Config = {
         "on-tertiary-container": "#000000",
 
         error: "#ff7351",
+        "error-dim": "#d53d18",
         "error-container": "#b92902",
+        "on-error-container": "#ffd2c8",
 
         background: "var(--color-background)",
         surface: "var(--color-surface)",
@@ -70,6 +72,9 @@ const config: Config = {
           "muted-light": "#6B7280",
         },
 
+        /** Stitch Circle Arena — semantic text on page canvas */
+        "on-background": "#f9f5f8",
+
         // Legacy CSS-variable tokens (kept for backward compat with theme.css)
         bg: "var(--bg)",
         text: "var(--text)",
@@ -88,6 +93,8 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-plus-jakarta)", "system-ui", "sans-serif"],
+        body: ["var(--font-plus-jakarta)", "system-ui", "sans-serif"],
+        headline: ["var(--font-space-grotesk)", "sans-serif"],
         display: ["var(--font-space-grotesk)", "sans-serif"],
       },
       borderRadius: {

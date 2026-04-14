@@ -8,6 +8,7 @@ import DashboardLiveCard from "@/components/dashboard/DashboardLiveCard";
 import DashboardLiveEmpty from "@/components/dashboard/DashboardLiveEmpty";
 import {
   getAuthContext,
+  getLiveArenaTargetForUser,
   getRecentCircleActivity,
   getUserBestRankInCircles,
   getUserPointsChipTotal,
@@ -24,7 +25,7 @@ export default async function DashboardPage() {
 
   await scheduleFixtureSyncForUser(dbUser.id);
 
-  const [tournaments, totalPoints, bestRank, predictionCount, activity] = await Promise.all([
+  const [tournaments, totalPoints, bestRank, predictionCount, activity, liveArena] = await Promise.all([
     listUserTournaments(dbUser.id, {
       take: 8,
       includeUpcomingMatch: true,
@@ -33,6 +34,7 @@ export default async function DashboardPage() {
     getUserBestRankInCircles(dbUser.id),
     getUserPredictionCount(dbUser.id),
     getRecentCircleActivity(dbUser.id, 6),
+    getLiveArenaTargetForUser(dbUser.id),
   ]);
 
   const spotlight = tournaments
@@ -40,6 +42,14 @@ export default async function DashboardPage() {
     .find(Boolean);
 
   const predictHref = spotlight ? `/tournaments/${spotlight.tournament.id}/vote` : "/predictions";
+  const historyHref = tournaments[0] ? `/tournaments/${tournaments[0].id}/history` : null;
+  const liveHref = liveArena ? `/tournaments/${liveArena.tournamentId}/live` : null;
+  const spotlightLiveArenaHref =
+    spotlight &&
+    spotlight.match.status === "LIVE" &&
+    liveArena?.tournamentId === spotlight.tournament.id
+      ? `/tournaments/${spotlight.tournament.id}/live`
+      : null;
 
   const rankLabel = bestRank != null ? `#${bestRank}` : "—";
   const rankSub =
@@ -64,10 +74,43 @@ export default async function DashboardPage() {
                 spotlight.match.status === "LIVE" || isTodayIst(new Date(spotlight.match.matchDate))
               }
               predictHref={predictHref}
+              liveArenaHref={spotlightLiveArenaHref}
+              isMatchLive={spotlight.match.status === "LIVE"}
             />
           ) : (
             <DashboardLiveEmpty />
           )}
+
+          <section className="flex flex-wrap gap-2">
+            <Link
+              href="/results"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-surface-container-high px-3 py-2 font-display text-[10px] font-bold uppercase tracking-widest text-on-surface transition-colors hover:border-primary/40 hover:text-primary-container"
+            >
+              <span className="material-symbols-outlined text-base text-primary-container">emoji_events</span>
+              Results
+            </Link>
+            {historyHref ? (
+              <Link
+                href={historyHref}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-surface-container-high px-3 py-2 font-display text-[10px] font-bold uppercase tracking-widest text-on-surface transition-colors hover:border-primary/40 hover:text-primary-container"
+              >
+                <span className="material-symbols-outlined text-base text-primary-container">history</span>
+                Match history
+              </Link>
+            ) : null}
+            {liveHref ? (
+              <Link
+                href={liveHref}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 font-display text-[10px] font-bold uppercase tracking-widest text-primary-container transition-colors hover:bg-primary/20"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
+                </span>
+                Live arena
+              </Link>
+            ) : null}
+          </section>
 
           <section className="grid grid-cols-2 gap-4">
             <div className="rounded-lg border border-zinc-800 bg-surface-container-high p-4">

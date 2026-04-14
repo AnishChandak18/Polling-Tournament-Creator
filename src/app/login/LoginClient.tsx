@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { getAuthCallbackUrl, setAuthRedirectCookie } from "@/lib/auth-browser";
 import { safeNextPath } from "@/lib/auth-redirect";
+import { navigateSpa } from "@/lib/client-navigation";
 import AuthStitchLayout from "@/components/auth/AuthStitchLayout";
 import GoogleGlyph from "@/components/auth/GoogleGlyph";
 import StadiumGlowPanel from "@/components/stadium/StadiumGlowPanel";
@@ -17,6 +18,7 @@ const DB_ERROR_MSG =
   "Database connection failed. Check DATABASE_URL in .env.local (use your Supabase database password, not the anon key).";
 
 export default function LoginClient() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/dashboard";
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +69,7 @@ export default function LoginClient() {
         setError(signError.message);
         return;
       }
-      window.location.href = safeNextPath(next);
+      await navigateSpa(router, safeNextPath(next));
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Sign-in failed.");
     } finally {

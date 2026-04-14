@@ -47,7 +47,7 @@ coverage/
 
 # --- Design reference exports (optional local; large) ---
 design/stitch/
-public/design/stitch-onboarding/
+public/design/
 
 # --- Misc ---
 *.pem

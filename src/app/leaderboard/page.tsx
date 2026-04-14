@@ -36,39 +36,39 @@ export default async function LeaderboardPage() {
         </p>
       </header>
 
-      <section className="glass-card rounded-lg p-6">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-xl text-primary-container">emoji_events</span>
-            <div className="font-display text-sm font-black uppercase tracking-widest text-on-surface">Your circles</div>
-          </div>
-          <Link
-            href="/tournaments"
-            className="font-display text-xs font-bold uppercase tracking-widest text-primary-container hover:underline"
-          >
-            Manage
-          </Link>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-xl text-primary-container">emoji_events</span>
+          <div className="font-display text-sm font-black uppercase tracking-widest text-on-surface">Your circles</div>
         </div>
+        <Link
+          href="/tournaments"
+          className="font-display text-xs font-bold uppercase tracking-widest text-primary-container hover:underline"
+        >
+          Manage
+        </Link>
+      </div>
 
-        <div className="mt-5 grid gap-3">
-          {tournaments.length === 0 ? (
-            <div className="text-sm text-on-surface-variant">No circles found.</div>
-          ) : (
-            tournaments.slice(0, 7).map((t, idx) => (
-              <CircleCard
-                key={t.id}
-                href={`/tournaments/${t.id}/leaderboard`}
-                name={t.name}
-                season={t.season}
-                status={t.status}
-                variant="ranking"
-                rank={ranks[idx]}
-                isFirst={ranks[idx] === 1}
-              />
-            ))
-          )}
-        </div>
-      </section>
+      <div className="grid gap-3">
+        {tournaments.length === 0 ? (
+          <div className="rounded-lg border border-zinc-800 bg-surface-container p-4 text-sm text-on-surface-variant">
+            No circles found.
+          </div>
+        ) : (
+          tournaments.slice(0, 7).map((t, idx) => (
+            <CircleCard
+              key={t.id}
+              href={`/tournaments/${t.id}/leaderboard`}
+              name={t.name}
+              season={t.season}
+              status={t.status}
+              variant="ranking"
+              rank={ranks[idx]}
+              isFirst={ranks[idx] === 1}
+            />
+          ))
+        )}
+      </div>
     </PageShell>
   );
 }

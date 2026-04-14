@@ -2,10 +2,15 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import PageShell from "@/components/layout/PageShell";
 import PointsChip from "@/components/ui/PointsChip";
+import CircleArenaNav from "@/components/circle-arena/CircleArenaNav";
 import MatchVoteCard from "@/components/voting/MatchVoteCard";
 import { getAuthContext, getTournamentWithMatchesForUser, getUserPointsChipTotal } from "@/services/server";
 import { asMatchDisplayMeta, groupMatchesByScheduleDay } from "@/lib/match-display";
-import { isPastIst, isTodayIst } from "@/lib/ist";
+import { canVoteOnMatch } from "@/lib/vote-window";
+
+function isKickoffPast(matchDate: Date) {
+  return matchDate.getTime() < Date.now();
+}
 
 export default async function TournamentVotePage({
   params,
@@ -23,17 +28,18 @@ export default async function TournamentVotePage({
   ]);
   if (!tournament) redirect("/tournaments");
 
-  const voteToday = tournament.matches.filter(
-    (m) => (m.status === "UPCOMING" || m.status === "LIVE") && isTodayIst(m.matchDate)
+  const liveMatches = tournament.matches.filter((m) => m.status === "LIVE");
+  const upcomingMatches = tournament.matches.filter(
+    (m) => m.status === "UPCOMING" && !isKickoffPast(m.matchDate)
   );
-  const upcomingOther = tournament.matches.filter(
-    (m) => m.status === "UPCOMING" && !isTodayIst(m.matchDate) && !isPastIst(m.matchDate)
+  /** Includes COMPLETED and stale UPCOMING (kickoff passed but sync not updated yet). */
+  const completed = tournament.matches.filter(
+    (m) => m.status === "COMPLETED" || (m.status === "UPCOMING" && isKickoffPast(m.matchDate))
   );
-  const completed = tournament.matches.filter((m) => m.status === "COMPLETED");
 
   type M = (typeof tournament.matches)[number];
 
-  function groupedCards(matches: M[], canVoteFlag: boolean) {
+  function groupedCards(matches: M[]) {
     return groupMatchesByScheduleDay(matches).map(({ label, matches: ms }) => (
       <div key={label} className="space-y-2">
         <h3 className="px-1 font-display text-xs font-black uppercase tracking-widest text-on-surface-variant">
@@ -50,10 +56,11 @@ export default async function TournamentVotePage({
                 matchDate: m.matchDate.toISOString(),
                 venue: m.venue,
                 status: m.status,
+                winnerTeam: m.winnerTeam ?? null,
                 displayMeta: asMatchDisplayMeta(m.displayMeta),
               }}
               existingVoteTeam={m.votes?.[0]?.teamVoted ?? null}
-              canVote={canVoteFlag}
+              canVote={canVoteOnMatch(m.matchDate, m.status)}
             />
           ))}
         </div>
@@ -76,6 +83,8 @@ export default async function TournamentVotePage({
         </Link>
       </div>
 
+      <CircleArenaNav tournamentId={tournament.id} hasLive={liveMatches.length > 0} />
+
       <header>
         <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
           {tournament.name} · IPL {tournament.season}
@@ -84,7 +93,7 @@ export default async function TournamentVotePage({
           Cast your vote
         </h1>
         <p className="mt-2 text-sm text-on-surface-variant">
-          Pick a team for each match. Voting opens on match day only.
+          Pick a team for each upcoming match. You can vote or change your pick until 30 minutes before kickoff.
         </p>
       </header>
 
@@ -94,21 +103,19 @@ export default async function TournamentVotePage({
         </div>
       ) : (
         <div className="space-y-10">
-          {voteToday.length > 0 ? (
+          {liveMatches.length > 0 ? (
             <section className="space-y-4">
-              <h2 className="font-display text-sm font-black uppercase tracking-widest text-secondary">
-                Open today
-              </h2>
-              <div className="space-y-6">{groupedCards(voteToday, true)}</div>
+              <h2 className="font-display text-sm font-black uppercase tracking-widest text-secondary">Live now</h2>
+              <div className="space-y-6">{groupedCards(liveMatches)}</div>
             </section>
           ) : null}
 
-          {upcomingOther.length > 0 ? (
+          {upcomingMatches.length > 0 ? (
             <section className="space-y-4">
-              <h2 className="font-display text-sm font-black uppercase tracking-widest text-on-surface-variant">
+              <h2 className="font-display text-sm font-black uppercase tracking-widest text-secondary">
                 Upcoming
               </h2>
-              <div className="space-y-6">{groupedCards(upcomingOther, false)}</div>
+              <div className="space-y-6">{groupedCards(upcomingMatches)}</div>
             </section>
           ) : null}
 
@@ -117,7 +124,7 @@ export default async function TournamentVotePage({
               <h2 className="font-display text-sm font-black uppercase tracking-widest text-on-surface-variant">
                 Completed
               </h2>
-              <div className="space-y-6 opacity-90">{groupedCards(completed, false)}</div>
+              <div className="space-y-6 opacity-90">{groupedCards(completed)}</div>
             </section>
           ) : null}
         </div>
