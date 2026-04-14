@@ -17,6 +17,7 @@ export async function listUserTournaments(
       id: true,
       name: true,
       season: true,
+      type: true,
       status: true,
       ownerId: true,
       createdAt: true,

@@ -2,21 +2,36 @@ import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import CircleArenaBottomNav from "@/components/circle-arena/CircleArenaBottomNav";
-import { getAuthContext, getUserBestRankInCircles, getUserPointsChipTotal } from "@/services/server";
+import {
+  getAuthContext,
+  getUserBestRankInCircles,
+  getUserCircleCount,
+  getUserPointsChipTotal,
+  getUserPredictionCount,
+  getUserWinRateStats,
+} from "@/services/server";
 
 export default async function ResultsPage() {
   const { supabaseUser, dbUser } = await getAuthContext();
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
 
-  const [totalPoints, bestRank] = await Promise.all([
+  const [totalPoints, bestRank, winStats, predictionCount, circleCount] = await Promise.all([
     getUserPointsChipTotal(dbUser.id),
     getUserBestRankInCircles(dbUser.id),
+    getUserWinRateStats(dbUser.id),
+    getUserPredictionCount(dbUser.id),
+    getUserCircleCount(dbUser.id),
   ]);
 
-  const rankDisplay = bestRank != null ? `#${bestRank}` : "#—";
-  const circlePct = bestRank != null ? Math.min(99, Math.max(5, 100 - bestRank)) : 50;
-  const dashOffset = 314 - (314 * circlePct) / 100;
+  const rankDisplay = bestRank != null ? `#${bestRank}` : "—";
+  const winRatePct =
+    winStats.winRate != null ? Math.round(winStats.winRate * 10) / 10 : null;
+  const ringPct =
+    winRatePct != null ? Math.min(99, Math.max(5, winRatePct)) : bestRank != null ? Math.min(99, Math.max(5, 100 - bestRank)) : 50;
+  const dashOffset = 314 - (314 * ringPct) / 100;
+
+  const accuracyLabel = winRatePct != null ? `${winRatePct}` : "—";
 
   return (
     <div className="min-h-screen bg-[#0e0e10] pb-32 text-on-background selection:bg-primary selection:text-on-primary-container">
@@ -44,17 +59,17 @@ export default async function ResultsPage() {
 
       <main className="mx-auto max-w-lg px-4 pb-32 pt-24">
         <div className="mb-8 text-center">
-          <h1 className="font-headline text-4xl font-black uppercase italic tracking-tighter text-yellow-400">RESULTS LOGGED</h1>
+          <h1 className="font-headline text-4xl font-black uppercase italic tracking-tighter text-yellow-400">YOUR STATS</h1>
           <div className="mx-auto mt-2 h-1 w-16 bg-yellow-400" />
+          <p className="mt-3 text-xs font-medium uppercase tracking-widest text-zinc-500">
+            Real numbers from your predictions (no stakes)
+          </p>
         </div>
 
         <div className="relative mb-6 overflow-hidden rounded-lg border border-zinc-800 bg-surface-container shadow-2xl">
           <div className="absolute right-0 top-0 p-3">
-            <span className="flex items-center gap-1 rounded bg-tertiary-container px-2 py-0.5 font-headline text-[10px] font-black uppercase tracking-widest text-on-tertiary-container">
-              <span className="material-symbols-outlined !text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                verified
-              </span>
-              PREDICTION SUCCESSFUL
+            <span className="rounded bg-zinc-800/90 px-2 py-0.5 font-headline text-[10px] font-black uppercase tracking-widest text-zinc-400">
+              {winStats.resolved > 0 ? `${winStats.wins} / ${winStats.resolved} correct` : "No resolved picks yet"}
             </span>
           </div>
           <div className="p-6">
@@ -63,38 +78,46 @@ export default async function ResultsPage() {
                 <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900">
                   <span className="font-headline text-xl font-black text-white">YOU</span>
                 </div>
-                <p className="font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">YOUR RUN</p>
+                <p className="font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">PICKS</p>
               </div>
               <div className="flex flex-col items-center">
                 <span className="font-headline text-2xl font-black italic text-zinc-600">VS</span>
                 <div className="mt-1 rounded-md border border-zinc-800 bg-zinc-950 px-3 py-1">
-                  <span className="font-headline text-sm font-bold text-yellow-400">COMPLETED</span>
+                  <span className="font-headline text-sm font-bold text-yellow-400">IPL</span>
                 </div>
               </div>
               <div className="text-center">
                 <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900">
-                  <span className="font-headline text-xl font-black text-white">IPL</span>
+                  <span className="font-headline text-xl font-black text-white">{predictionCount}</span>
                 </div>
-                <p className="font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">SEASON</p>
+                <p className="font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">TOTAL</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col items-center justify-center border border-zinc-800/50 bg-zinc-950/50 p-4">
-                <span className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">ACCURACY</span>
+                <span className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                  WIN RATE
+                </span>
                 <span className="font-headline text-3xl font-black italic tracking-tighter text-white">
-                  {bestRank != null ? Math.min(99, 70 + Math.min(29, 30 - bestRank)) : "—"}
+                  {accuracyLabel}
                   <span className="text-yellow-400">%</span>
+                </span>
+                <span className="mt-1 text-center text-[9px] uppercase tracking-wider text-zinc-600">
+                  On completed matches with a result
                 </span>
               </div>
               <div className="flex flex-col items-center justify-center border border-zinc-800/50 bg-zinc-950/50 p-4">
-                <span className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">MULTIPLIER</span>
-                <span className="font-headline text-3xl font-black italic tracking-tighter text-white">x2.4</span>
+                <span className="mb-1 font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                  CIRCLES
+                </span>
+                <span className="font-headline text-3xl font-black italic tracking-tighter text-white">{circleCount}</span>
+                <span className="mt-1 text-center text-[9px] uppercase tracking-wider text-zinc-600">You&apos;re in</span>
               </div>
             </div>
           </div>
           <div className="flex items-center justify-between border-t border-yellow-400/20 bg-yellow-400/10 p-4">
-            <span className="font-headline text-xs font-black uppercase tracking-widest text-yellow-400">Total Earnings</span>
-            <span className="font-headline text-2xl font-black text-yellow-400">+{totalPoints.toLocaleString()} ARENA POINTS</span>
+            <span className="font-headline text-xs font-black uppercase tracking-widest text-yellow-400">Total points</span>
+            <span className="font-headline text-2xl font-black text-yellow-400">{totalPoints.toLocaleString()} pts</span>
           </div>
         </div>
 
@@ -105,7 +128,7 @@ export default async function ResultsPage() {
             </div>
             <div className="relative z-10 text-center">
               <span className="mb-3 block font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                Global Ranking Update
+                Best rank in a circle
               </span>
               <div className="relative flex h-28 w-28 items-center justify-center">
                 <svg className="absolute h-full w-full -rotate-90" viewBox="0 0 112 112">
@@ -124,7 +147,7 @@ export default async function ResultsPage() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="font-headline text-2xl font-black text-white">{rankDisplay}</span>
                   <span className="font-headline text-[8px] font-bold uppercase tracking-widest text-yellow-400">
-                    best in circle
+                    best placement
                   </span>
                 </div>
               </div>
@@ -132,14 +155,14 @@ export default async function ResultsPage() {
           </div>
           <div className="col-span-2 flex flex-col gap-3">
             <div className="flex h-full flex-col items-center justify-center border border-zinc-800 bg-zinc-900 p-3">
-              <span className="material-symbols-outlined mb-1 !text-3xl text-yellow-400">trending_up</span>
-              <span className="font-headline text-xl font-black text-white">TOP 5%</span>
-              <span className="font-headline text-[8px] font-bold uppercase tracking-widest text-zinc-500">Elite Tier</span>
+              <span className="material-symbols-outlined mb-1 !text-3xl text-yellow-400">emoji_events</span>
+              <span className="font-headline text-xl font-black text-white">{winStats.wins}</span>
+              <span className="font-headline text-[8px] font-bold uppercase tracking-widest text-zinc-500">Correct</span>
             </div>
             <div className="flex h-full flex-col items-center justify-center border border-zinc-800 bg-zinc-900 p-3">
-              <span className="material-symbols-outlined mb-1 !text-3xl text-yellow-400">local_fire_department</span>
-              <span className="font-headline text-xl font-black text-white">7 DAY</span>
-              <span className="font-headline text-[8px] font-bold uppercase tracking-widest text-zinc-500">Win Streak</span>
+              <span className="material-symbols-outlined mb-1 !text-3xl text-yellow-400">check_circle</span>
+              <span className="font-headline text-xl font-black text-white">{winStats.resolved}</span>
+              <span className="font-headline text-[8px] font-bold uppercase tracking-widest text-zinc-500">Resolved</span>
             </div>
           </div>
         </div>

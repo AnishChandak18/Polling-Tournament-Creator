@@ -8,15 +8,12 @@ import {
   getUserPointsChipTotal,
   getUserRankInTournament,
   listUserTournaments,
-  scheduleFixtureSyncForUser,
 } from "@/services/server";
 
 export default async function LeaderboardPage() {
   const { supabaseUser, dbUser } = await getAuthContext();
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
-
-  await scheduleFixtureSyncForUser(dbUser.id);
 
   const tournaments = await listUserTournaments(dbUser.id, { take: 12 });
   const [totalPoints, ...ranks] = await Promise.all([
@@ -45,7 +42,7 @@ export default async function LeaderboardPage() {
           href="/tournaments"
           className="font-display text-xs font-bold uppercase tracking-widest text-primary-container hover:underline"
         >
-          Manage
+          All circles
         </Link>
       </div>
 

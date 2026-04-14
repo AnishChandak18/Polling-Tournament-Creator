@@ -4,6 +4,14 @@ const nextConfig = {
   serverExternalPackages: ["@prisma/client", "prisma"],
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
+  /** Longer client router cache for dynamic routes = snappier back/forward & revisits (data still refreshes on hard reload). */
+  experimental: {
+    /** Client router keeps RSC payloads longer → fewer full server round-trips when revisiting. */
+    staleTimes: {
+      dynamic: 300,
+      static: 600,
+    },
+  },
   async headers() {
     return [
       {

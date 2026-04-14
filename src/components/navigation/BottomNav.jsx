@@ -1,36 +1,19 @@
 "use client";
 
 import Link from "next/link";
-
-const ITEMS = [
-  {
-    key: "predictions",
-    href: "/predictions",
-    label: "Predictions",
-    icon: "ads_click",
-  },
-  { key: "circles", href: "/tournaments", label: "Circles", icon: "groups" },
-  { key: "home", href: "/dashboard", label: "Home", icon: "sports_cricket" },
-  {
-    key: "leaderboard",
-    href: "/leaderboard",
-    label: "Rankings",
-    icon: "leaderboard",
-  },
-  { key: "results", href: "/results", label: "Results", icon: "emoji_events" },
-  { key: "profile", href: "/profile", label: "Profile", icon: "person" },
-];
+import { MAIN_NAV_ITEMS } from "@/components/navigation/main-nav-items";
 
 export default function BottomNav({ active = "home" }) {
   return (
     <nav className="fixed bottom-0 left-0 z-50 w-full rounded-t-2xl border-t border-outline-variant/10 bg-zinc-950/90 px-2 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-10px_40px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:px-4 sm:pt-3">
       <div className="mx-auto grid w-full max-w-4xl grid-cols-6 items-center gap-0.5 sm:gap-1">
-        {ITEMS.map(({ key, href, label, icon }) => {
+        {MAIN_NAV_ITEMS.map(({ key, href, label, icon }) => {
           const isActive = key === active;
           return (
             <Link
               key={key}
               href={href}
+              prefetch
               className={[
                 "flex w-full min-w-0 flex-col items-center justify-center rounded-xl px-1 py-1.5 transition active:scale-95 sm:px-2",
                 isActive

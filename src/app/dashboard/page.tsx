@@ -14,7 +14,6 @@ import {
   getUserPointsChipTotal,
   getUserPredictionCount,
   listUserTournaments,
-  scheduleFixtureSyncForUser,
 } from "@/services/server";
 import { isTodayIst } from "@/lib/ist";
 
@@ -22,8 +21,6 @@ export default async function DashboardPage() {
   const { supabaseUser, dbUser } = await getAuthContext();
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
-
-  await scheduleFixtureSyncForUser(dbUser.id);
 
   const [tournaments, totalPoints, bestRank, predictionCount, activity, liveArena] = await Promise.all([
     listUserTournaments(dbUser.id, {
@@ -137,15 +134,20 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between border-b border-zinc-800 p-5">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary-container">query_stats</span>
-                <h2 className="font-display text-sm font-black uppercase tracking-[0.2em] text-on-surface">
-                  Quick Vote
-                </h2>
+                <div>
+                  <h2 className="font-display text-sm font-black uppercase tracking-[0.2em] text-on-surface">
+                    Up next
+                  </h2>
+                  <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-500">
+                    Snapshot — use Predictions for every circle
+                  </p>
+                </div>
               </div>
               <Link
                 href="/predictions"
                 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-primary-container"
               >
-                Open all
+                All circles
               </Link>
             </div>
             <div className="p-6">
@@ -162,14 +164,13 @@ export default async function DashboardPage() {
                         <Link
                           key={`${t.id}-${m.id}`}
                           href={`/tournaments/${t.id}/vote`}
-                          className="group relative h-14 overflow-hidden rounded-sm border border-zinc-800 transition-all active:scale-95"
+                          className="group relative block border border-zinc-800 bg-zinc-900/50 p-1 transition-all hover:border-primary/40 active:scale-[0.99]"
                         >
-                          <div className="absolute inset-0 bg-primary-container/5 transition-colors group-hover:bg-primary-container/10" />
-                          <div className="relative flex h-full items-center justify-between px-4">
-                            <span className="font-display font-black uppercase tracking-widest text-zinc-400 transition-colors group-hover:text-primary-container">
-                              {m.team1} vs {m.team2}
+                          <div className="flex h-14 items-center justify-between border border-zinc-800/50 px-4">
+                            <span className="font-headline text-xs font-bold uppercase tracking-tight text-zinc-300 transition-colors group-hover:text-primary">
+                              {m.team1} <span className="text-zinc-600">vs</span> {m.team2}
                             </span>
-                            <span className="rounded bg-error/20 px-2 py-0.5 text-[10px] font-bold uppercase text-error">
+                            <span className="rounded bg-zinc-950 px-2 py-0.5 font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                               {m.status}
                             </span>
                           </div>
@@ -203,13 +204,13 @@ export default async function DashboardPage() {
       <section className="space-y-3">
         <div className="flex items-end justify-between">
           <h3 className="font-display text-sm font-black uppercase tracking-widest text-on-surface">
-            Private Circles
+            Your circles
           </h3>
           <Link
             href="/tournaments"
             className="text-[10px] font-bold uppercase tracking-widest text-primary-container hover:underline"
           >
-            View All
+            Manage &amp; join
           </Link>
         </div>
 

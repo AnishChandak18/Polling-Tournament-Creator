@@ -1,28 +1,21 @@
 "use client";
 
 import Link from "next/link";
-
-const ITEMS = [
-  { key: "predictions", href: "/predictions", label: "Predictions", icon: "query_stats" },
-  { key: "circles", href: "/tournaments", label: "Circles", icon: "group" },
-  { key: "home", href: "/dashboard", label: "Home", icon: "stadium" },
-  { key: "leaderboard", href: "/leaderboard", label: "Rankings", icon: "leaderboard" },
-  { key: "results", href: "/results", label: "Results", icon: "emoji_events" },
-  { key: "profile", href: "/profile", label: "Profile", icon: "person" },
-];
+import { MAIN_NAV_ITEMS } from "@/components/navigation/main-nav-items";
 
 /**
- * Stitch Circle Arena — bottom nav (md:hidden), Circles active on this flow.
+ * Circle-arena flows — same destinations as PageShell bottom nav (mobile).
  */
 export default function CircleArenaBottomNav({ active = "circles" }) {
   return (
     <nav className="fixed bottom-0 left-0 z-50 flex h-[4.25rem] w-full items-center border-t border-zinc-800 bg-zinc-950 px-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.5)] md:hidden">
-      {ITEMS.map(({ key, href, label, icon }) => {
+      {MAIN_NAV_ITEMS.map(({ key, href, label, icon }) => {
         const isActive = key === active;
         return (
           <Link
             key={key}
             href={href}
+            prefetch
             className={[
               "flex min-w-0 flex-1 flex-col items-center justify-center px-0.5 pt-2 pb-1 transition-all duration-300 ease-out",
               isActive

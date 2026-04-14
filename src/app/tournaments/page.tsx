@@ -6,15 +6,12 @@ import {
   getAuthContext,
   getUserPointsChipTotal,
   listUserTournaments,
-  scheduleFixtureSyncForUser,
 } from "@/services/server";
 
 export default async function TournamentsPage() {
   const { supabaseUser, dbUser } = await getAuthContext();
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
-
-  await scheduleFixtureSyncForUser(dbUser.id);
 
   const [tournaments, totalPoints] = await Promise.all([
     listUserTournaments(dbUser.id),

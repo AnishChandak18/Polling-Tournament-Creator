@@ -1,23 +1,31 @@
 import Link from "next/link";
 import Image from "next/image";
+import {
+  formatMatchTopLine,
+  displayTeamName,
+} from "@/lib/circle-match-card-format";
 import { getTeamLogoByName } from "@/lib/team-logos";
 
-function shortTeam(name) {
-  const w = name.trim().split(/\s+/)[0];
-  return w?.length ? w : name;
-}
+const matchDateFormatter = new Intl.DateTimeFormat("en-IN", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Asia/Kolkata",
+});
 
 /**
- * Stitch Home — "Live Now" match spotlight (mobile canvas).
+ * Dashboard spotlight — same shell as MatchVoteCard (/vote).
  *
  * @param {object} props
  * @param {string} props.team1
  * @param {string} props.team2
  * @param {Date} props.matchDate
- * @param {string} props.season
+ * @param {string|number} props.season
  * @param {boolean} props.isLiveDay
  * @param {string} props.predictHref
- * @param {string | null} [props.liveArenaHref]
+ * @param {string|null|undefined} [props.liveArenaHref]
  * @param {boolean} [props.isMatchLive]
  */
 export default function DashboardLiveCard({
@@ -30,100 +38,125 @@ export default function DashboardLiveCard({
   liveArenaHref = null,
   isMatchLive = false,
 }) {
-  const t1 = shortTeam(team1);
-  const t2 = shortTeam(team2);
+  const matchLike = {
+    status: isMatchLive ? "LIVE" : "UPCOMING",
+    matchDate: matchDate.toISOString(),
+  };
+  const meta = { seriesName: "IPL" };
+  const topLine = formatMatchTopLine(matchLike, meta, { kickoffPast: false });
+  const t1 = displayTeamName(team1, null);
+  const t2 = displayTeamName(team2, null);
   const team1Logo = getTeamLogoByName(team1);
   const team2Logo = getTeamLogoByName(team2);
-  const timeLabel = new Intl.DateTimeFormat("en-IN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Kolkata",
-  }).format(matchDate);
+  const formattedWhen = matchDateFormatter.format(matchDate);
+
+  const ctaHref = isMatchLive && liveArenaHref ? liveArenaHref : predictHref;
+  const ctaLabel =
+    isMatchLive && liveArenaHref ? "Enter live arena" : "Predict now";
+  const ctaIcon = isMatchLive && liveArenaHref ? "sensors" : "query_stats";
 
   return (
     <section>
-      <div className="group relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-high">
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent" />
-        <div className="relative z-10 p-5">
-          <div className="mb-4 flex items-start justify-between">
-            {isLiveDay ? (
-              <span className="flex items-center gap-1 rounded bg-error px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
-                Live Now
-              </span>
+      <div className="group relative border border-zinc-800 bg-zinc-900/50 p-1 transition-all hover:border-primary/50">
+        <div className="absolute right-0 top-0 p-2">
+          <span className="material-symbols-outlined text-zinc-700 group-hover:text-primary/50">
+            radar
+          </span>
+        </div>
+        <div className="border border-zinc-800/50 p-4">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="text-[10px] font-headline font-bold uppercase tracking-widest text-zinc-500">
+              {topLine}
+            </div>
+            {isMatchLive ? (
+              <div className="bg-primary/10 px-2 py-0.5 font-headline text-[10px] font-bold uppercase tracking-widest text-primary">
+                LIVE
+              </div>
             ) : (
-              <span className="rounded bg-surface-container px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                Upcoming
-              </span>
+              <div className="font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                +1 pt if correct
+              </div>
             )}
-            <span className="text-xs font-medium text-on-surface-variant">Indian Premier League</span>
           </div>
 
-          <div className="flex items-center justify-between text-center">
-            <div className="flex-1">
-              <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-outline-variant bg-zinc-800">
+          <div
+            className={
+              isMatchLive
+                ? "mb-6 flex items-center justify-between gap-4"
+                : "mb-6 flex items-center justify-between gap-4 transition-all opacity-100"
+            }
+          >
+            <div className="flex-1 text-center">
+              <div className="relative mx-auto mb-2 h-16 w-16 border border-zinc-700 bg-zinc-800 p-2">
                 {team1Logo ? (
                   <Image
                     src={team1Logo}
-                    alt={team1}
-                    width={48}
-                    height={48}
-                    className="scale-125 object-cover"
+                    alt=""
+                    fill
+                    sizes="64px"
+                    className="object-contain p-1"
+                    unoptimized
                   />
                 ) : (
-                  <span className="material-symbols-outlined text-2xl text-secondary">shield</span>
+                  <span className="flex h-full w-full items-center justify-center font-headline text-[10px] font-bold text-zinc-500">
+                    {t1.slice(0, 3).toUpperCase()}
+                  </span>
                 )}
               </div>
-              <p className="font-display text-xs font-bold uppercase tracking-tight text-on-surface">{t1}</p>
-              <p className="mt-1 font-display text-xl font-extrabold text-on-surface">—</p>
+              <span className="font-headline text-sm font-bold uppercase tracking-tighter">
+                {t1}
+              </span>
             </div>
-            <div className="px-4">
-              <span className="font-display text-lg font-black italic text-zinc-600">VS</span>
+            <div className="flex flex-col items-center">
+              <span className="font-headline text-2xl font-black italic text-zinc-700">
+                VS
+              </span>
             </div>
-            <div className="flex-1">
-              <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-outline-variant bg-zinc-800">
+            <div className="flex-1 text-center">
+              <div className="relative mx-auto mb-2 h-16 w-16 border border-zinc-700 bg-zinc-800 p-2">
                 {team2Logo ? (
                   <Image
                     src={team2Logo}
-                    alt={team2}
-                    width={48}
-                    height={48}
-                    className="scale-125 object-cover"
+                    alt=""
+                    fill
+                    sizes="64px"
+                    className="object-contain p-1"
+                    unoptimized
                   />
                 ) : (
-                  <span className="material-symbols-outlined text-2xl text-primary-container">shield</span>
+                  <span className="flex h-full w-full items-center justify-center font-headline text-[10px] font-bold text-zinc-500">
+                    {t2.slice(0, 3).toUpperCase()}
+                  </span>
                 )}
               </div>
-              <p className="font-display text-xs font-bold uppercase tracking-tight text-on-surface">{t2}</p>
-              <p className="mt-1 font-display text-xl font-extrabold text-on-surface">—</p>
+              <span className="font-headline text-sm font-bold uppercase tracking-tighter">
+                {t2}
+              </span>
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col gap-3">
-            <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-              <span>Start · {timeLabel} IST</span>
-              <span>IPL {season}</span>
-            </div>
-            {isMatchLive && liveArenaHref ? (
-              <Link
-                href={liveArenaHref}
-                className="btn-primary pulse-shadow flex h-14 w-full items-center justify-center gap-2 py-4 text-sm uppercase tracking-widest"
-              >
-                <span className="material-symbols-outlined text-xl">sensors</span>
-                Enter live arena
-              </Link>
-            ) : (
-              <Link
-                href={predictHref}
-                className="btn-primary pulse-shadow flex h-14 w-full items-center justify-center gap-2 py-4 text-sm uppercase tracking-widest"
-              >
-                <span className="material-symbols-outlined text-xl">query_stats</span>
-                Predict Now
-              </Link>
-            )}
+          <p className="mb-4 text-center font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+            {formattedWhen}
+            <span className="text-zinc-600"> · IPL {season}</span>
+            {isLiveDay && !isMatchLive ? (
+              <span className="ml-2 rounded bg-error/20 px-1.5 py-0.5 text-[9px] font-black text-error">
+                Match day
+              </span>
+            ) : null}
+          </p>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Link
+              href={ctaHref}
+              className="col-span-2 flex h-14 w-full items-center justify-center gap-2 border border-zinc-700 bg-zinc-800 py-3 font-headline text-xs font-bold uppercase tracking-widest text-on-surface transition-all hover:bg-primary hover:text-on-primary"
+            >
+              <span className="material-symbols-outlined text-xl">
+                {ctaIcon}
+              </span>
+              {ctaLabel}
+            </Link>
           </div>
         </div>
-        <div className="pointer-events-none absolute -bottom-10 -right-10 h-32 w-32 rounded-full bg-yellow-400/5 blur-3xl" />
       </div>
     </section>
   );

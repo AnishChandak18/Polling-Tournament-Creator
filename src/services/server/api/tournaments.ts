@@ -5,26 +5,11 @@ import { HttpError } from "@/services/server/api/errors";
 import { upsertIplFixturesForTournament } from "@/services/server/api/sync";
 import { isUserFixtureSyncFresh } from "@/services/server/fixture-sync";
 import { generateUniqueJoinCode } from "@/services/server/circle-invite";
+import { listUserTournaments } from "@/services/server/tournaments";
 
 export async function listTournamentsForCurrentUser() {
   const user = await getCurrentUserOrThrow();
-
-  const tournaments = await prisma.tournament.findMany({
-    where: {
-      OR: [{ ownerId: user.id }, { members: { some: { userId: user.id } } }],
-    },
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      name: true,
-      season: true,
-      type: true,
-      status: true,
-      ownerId: true,
-      createdAt: true,
-    },
-  });
-
+  const tournaments = await listUserTournaments(user.id);
   return { tournaments };
 }
 

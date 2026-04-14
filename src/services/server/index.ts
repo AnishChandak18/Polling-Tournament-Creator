@@ -16,6 +16,7 @@ export {
   getUserPointsChipTotal,
   getUserBestRankInCircles,
   getUserPredictionCount,
+  getUserCircleCount,
   getUserWinRateStats,
   getUserRankInTournament,
 } from "@/services/server/user-stats";

@@ -7,14 +7,13 @@ import {
   getTournamentLeaderboardForUser,
   getUserPointsChipTotal,
   getUserRankInTournament,
-  scheduleFixtureSyncForUser,
 } from "@/services/server";
 import { asMatchDisplayMeta } from "@/lib/match-display";
 import { canVoteOnMatch } from "@/lib/vote-window";
 import CircleArenaTopBar from "@/components/circle-arena/CircleArenaTopBar";
 import CircleArenaBottomNav from "@/components/circle-arena/CircleArenaBottomNav";
 import CircleArenaNav from "@/components/circle-arena/CircleArenaNav";
-import CircleArenaMatchCard from "@/components/circle-arena/CircleArenaMatchCard";
+import MatchVoteCard from "@/components/voting/MatchVoteCard";
 import CircleArenaLeaderboard from "@/components/circle-arena/CircleArenaLeaderboard";
 import CircleArenaInvite from "@/components/circle-arena/CircleArenaInvite";
 
@@ -28,6 +27,7 @@ export default async function TournamentDetailPage({
   if (!dbUser) redirect("/login?error=database");
 
   const { id: tournamentId } = await params;
+
   const [tournament, totalPoints, memberCount, leaderboardData, userRank] = await Promise.all([
     getTournamentWithMatchesForUser(tournamentId, dbUser.id),
     getUserPointsChipTotal(dbUser.id),
@@ -37,8 +37,6 @@ export default async function TournamentDetailPage({
   ]);
 
   if (!tournament) redirect("/tournaments");
-
-  await scheduleFixtureSyncForUser(dbUser.id);
 
   const visibleMatches = tournament.matches
     .filter((m) => m.status !== "COMPLETED")
@@ -106,12 +104,12 @@ export default async function TournamentDetailPage({
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {visibleMatches.length === 0 ? (
-            <div className="col-span-full border border-zinc-800 bg-zinc-900/50 p-8 text-center text-zinc-500">
+            <div className="col-span-full rounded-xl border border-zinc-800 bg-zinc-900/40 p-8 text-center font-headline text-sm text-zinc-500">
               No fixtures available for this season yet.
             </div>
           ) : (
             visibleMatches.map((m) => (
-              <CircleArenaMatchCard
+              <MatchVoteCard
                 key={m.id}
                 match={{
                   id: m.id,
@@ -120,8 +118,10 @@ export default async function TournamentDetailPage({
                   matchDate: m.matchDate.toISOString(),
                   venue: m.venue,
                   status: m.status,
+                  winnerTeam: m.winnerTeam ?? null,
+                  displayMeta: asMatchDisplayMeta(m.displayMeta),
                 }}
-                displayMeta={asMatchDisplayMeta(m.displayMeta)}
+                existingVoteTeam={m.votes?.[0]?.teamVoted ?? null}
                 canVote={canVoteOnMatch(m.matchDate, m.status)}
               />
             ))

@@ -43,6 +43,11 @@ export async function getUserPredictionCount(userId: string): Promise<number> {
   return withDbFallback(() => prisma.vote.count({ where: { userId } }), 0);
 }
 
+/** Number of circles the user belongs to (including circles they own). */
+export async function getUserCircleCount(userId: string): Promise<number> {
+  return withDbFallback(() => prisma.tournamentMember.count({ where: { userId } }), 0);
+}
+
 /** Win rate on completed matches with a recorded winner. */
 export async function getUserWinRateStats(userId: string): Promise<{
   winRate: number | null;

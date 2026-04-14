@@ -5,6 +5,9 @@ import {
   syncIplFixturesForTournamentIds,
 } from "@/services/server/api/sync";
 
+/** Skip expensive “needs sync?” scans right after a successful sync (burst navigations). */
+const FIXTURE_SYNC_DEBOUNCE_MS = 90_000;
+
 /** Refresh IPL fixtures + match statuses for every circle the user can access (one schedule fetch). */
 export async function syncFixturesForUserTournaments(userId: string): Promise<void> {
   const rows = await prisma.tournament.findMany({
@@ -36,6 +39,11 @@ async function computeUserNeedsFixtureSync(
   userId: string
 ): Promise<boolean> {
   if (!lastFixtureSyncAt) return true;
+
+  const sinceSyncMs = Date.now() - lastFixtureSyncAt.getTime();
+  if (sinceSyncMs >= 0 && sinceSyncMs < FIXTURE_SYNC_DEBOUNCE_MS) {
+    return false;
+  }
 
   const tournamentIds = await getUserTournamentIds(userId);
   if (tournamentIds.length === 0) return false;
@@ -71,22 +79,23 @@ export async function isUserFixtureSyncFresh(userId: string): Promise<boolean> {
 }
 
 /**
- * First sync blocks until data exists; later syncs run after the response when a match
- * has played out since the last sync.
+ * Enqueues a full IPL sync for all of this user’s circles **after the HTTP response is sent**.
+ * Never blocks page render. List/hub pages do not call this; opening a circle still loads fixtures
+ * via {@link getTournamentWithMatchesForUser} when needed. Use from APIs/cron if you want background refresh.
  */
-export async function scheduleFixtureSyncForUser(userId: string): Promise<void> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { lastFixtureSyncAt: true },
-  });
-  if (!user) return;
-
-  if (!(await computeUserNeedsFixtureSync(user.lastFixtureSyncAt, userId))) {
-    return;
-  }
-
-  const run = async () => {
+export function scheduleFixtureSyncForUser(userId: string): void {
+  after(async () => {
     try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { lastFixtureSyncAt: true },
+      });
+      if (!user) return;
+
+      if (!(await computeUserNeedsFixtureSync(user.lastFixtureSyncAt, userId))) {
+        return;
+      }
+
       await syncFixturesForUserTournaments(userId);
       await prisma.user.update({
         where: { id: userId },
@@ -95,12 +104,5 @@ export async function scheduleFixtureSyncForUser(userId: string): Promise<void> 
     } catch (e) {
       console.error("[scheduleFixtureSyncForUser]", e);
     }
-  };
-
-  if (!user.lastFixtureSyncAt) {
-    await run();
-    return;
-  }
-
-  after(run);
+  });
 }

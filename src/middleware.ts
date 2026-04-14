@@ -39,7 +39,14 @@ export async function middleware(request: NextRequest) {
   const { supabase, response } = createSupabaseMiddlewareClient(request);
 
   const pathname = request.nextUrl.pathname;
-  const isProtectedRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/tournaments");
+  const isProtectedRoute =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/tournaments") ||
+    pathname === "/predictions" ||
+    pathname === "/leaderboard" ||
+    pathname === "/profile" ||
+    pathname === "/results" ||
+    pathname === "/onboarding";
   const isSetupRoute = pathname.startsWith("/setup");
   const isAuthGateRoute =
     pathname === "/login" || pathname === "/signup" || pathname === "/forgot-password";
@@ -54,7 +61,7 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Fast path: avoid costly auth network calls when no Supabase session cookie exists.
+  // Fast path: no session cookie → unauthenticated for routing purposes.
   const hasSessionCookie = hasSupabaseSessionCookie(request);
   if (!hasSessionCookie) {
     if (isProtectedRoute) {
@@ -66,29 +73,15 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  let user = null;
-  try {
-    const result = await supabase.auth.getUser();
-    user = result.data.user;
-  } catch (error) {
-    console.warn("[middleware] supabase auth getUser failed:", error);
-    if (isProtectedRoute) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      url.searchParams.set("next", pathname);
-      return NextResponse.redirect(url);
-    }
+  // Has a Supabase auth cookie. Do NOT call supabase.auth.getUser() here — that adds a
+  // network round-trip on every navigation; Server Components already validate via getAuthContext().
+  // We only use cookie presence for redirects; invalid/expired sessions are handled on the page.
+
+  if (isProtectedRoute) {
     return response;
   }
 
-  if (!user && isProtectedRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.searchParams.set("next", pathname);
-    return NextResponse.redirect(url);
-  }
-
-  if (user && isAuthGateRoute) {
+  if (isAuthGateRoute) {
     const next = request.nextUrl.searchParams.get("next");
     if (next && next.startsWith("/") && !next.startsWith("//")) {
       return NextResponse.redirect(new URL(next, request.url));
@@ -99,7 +92,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && isSetupRoute) {
+  if (isSetupRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
@@ -112,6 +105,11 @@ export const config = {
   matcher: [
     "/dashboard/:path*",
     "/tournaments/:path*",
+    "/predictions",
+    "/leaderboard",
+    "/profile",
+    "/results",
+    "/onboarding",
     "/login",
     "/signup",
     "/forgot-password",

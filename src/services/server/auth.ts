@@ -1,7 +1,9 @@
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getOrCreateUserBySupabase } from "@/lib/currentUser";
 
-export async function getAuthContext() {
+/** Dedupes Supabase + DB user lookup when multiple server components call auth in one request. */
+export const getAuthContext = cache(async function getAuthContext() {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user: supabaseUser },
@@ -13,4 +15,4 @@ export async function getAuthContext() {
 
   const dbUser = await getOrCreateUserBySupabase(supabaseUser).catch(() => null);
   return { supabaseUser, dbUser };
-}
+});

@@ -98,7 +98,7 @@ export default async function TournamentVotePage({
       </header>
 
       {tournament.matches.length === 0 ? (
-        <div className="glass-card rounded-2xl p-6 text-center text-on-surface-variant">
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 text-center text-on-surface-variant">
           No fixtures available for this season yet.
         </div>
       ) : (

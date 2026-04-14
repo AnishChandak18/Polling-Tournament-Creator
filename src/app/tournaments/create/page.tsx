@@ -35,8 +35,8 @@ export default function CreateTournamentPage() {
     <main className="min-h-screen bg-background bg-stadium-mesh p-6 text-on-surface">
       <div className="mx-auto max-w-4xl">
         <BackButton fallbackHref="/tournaments" className="mb-4" />
-        <section className="glass-card mt-6 overflow-hidden rounded-2xl">
-          <div className="grid md:grid-cols-[1.1fr_1fr]">
+        <section className="mt-6 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50 p-1">
+          <div className="grid overflow-hidden rounded-xl border border-zinc-800/50 md:grid-cols-[1.1fr_1fr]">
             <div className="border-b border-outline-variant/15 p-8 md:border-b-0 md:border-r md:p-10">
               <div className="text-xs font-black uppercase tracking-widest text-primary">IPL Custom League</div>
               <h1 className="font-display mt-3 text-4xl font-black uppercase italic leading-tight">

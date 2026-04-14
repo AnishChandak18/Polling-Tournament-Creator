@@ -8,15 +8,12 @@ import {
   getRecentVotesForUser,
   getUserPointsChipTotal,
   listUserTournaments,
-  scheduleFixtureSyncForUser,
 } from "@/services/server";
 
 export default async function PredictionsPage() {
   const { supabaseUser, dbUser } = await getAuthContext();
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
-
-  await scheduleFixtureSyncForUser(dbUser.id);
 
   const [tournaments, totalPoints, recentVotes] = await Promise.all([
     listUserTournaments(dbUser.id, {
@@ -35,7 +32,7 @@ export default async function PredictionsPage() {
       <header className="section-header">
         <h1 className="font-display text-4xl font-black tracking-tight text-on-surface">Match Predictions</h1>
         <p className="mt-2 max-w-2xl text-on-surface-variant">
-          Live matches and upcoming fixtures from your circles.
+          Vote here for each circle. Home shows one spotlight match; Circles is for creating, joining, and settings.
         </p>
       </header>
 
@@ -44,7 +41,7 @@ export default async function PredictionsPage() {
           Pick a circle to vote
         </h2>
         {tournaments.length === 0 ? (
-          <div className="card-stadium">
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
             <div className="text-sm font-bold text-on-surface">No circles yet</div>
             <div className="mt-2 text-sm text-on-surface-variant">
               Create a tournament to start predicting.
@@ -88,7 +85,11 @@ export default async function PredictionsPage() {
         ) : (
           <div className="space-y-2">
             {recentVotes.map((vote) => (
-              <div key={vote.id} className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3">
+              <div
+                key={vote.id}
+                className="group relative border border-zinc-800 bg-zinc-900/50 p-1 transition-all hover:border-primary/30"
+              >
+                <div className="border border-zinc-800/50 p-3">
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-display text-sm font-black text-on-surface">
                     {vote.team1} <span className="text-zinc-500">vs</span> {vote.team2}
@@ -110,10 +111,11 @@ export default async function PredictionsPage() {
                 <div className="mt-2">
                   <Link
                     href={`/tournaments/${vote.tournamentId}/vote`}
-                    className="text-[10px] font-bold uppercase tracking-widest text-primary-container hover:underline"
+                    className="font-headline text-[10px] font-bold uppercase tracking-widest text-primary hover:underline"
                   >
                     Open match voting
                   </Link>
+                </div>
                 </div>
               </div>
             ))}

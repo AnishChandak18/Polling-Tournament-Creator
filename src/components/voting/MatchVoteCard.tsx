@@ -63,7 +63,6 @@ export default function MatchVoteCard({
     (match.status === "UPCOMING" && kickoffPast);
   const isLive = match.status === "LIVE";
   const topLine = formatMatchTopLine(match, meta, { kickoffPast });
-  const mult = isLive ? "2.4x" : "1.8x";
 
   const t1 = displayTeamName(match.team1, meta?.team1Short);
   const t2 = displayTeamName(match.team2, meta?.team2Short);
@@ -108,13 +107,17 @@ export default function MatchVoteCard({
           <div className="text-[10px] font-headline font-bold uppercase tracking-widest text-zinc-500">
             {topLine}
           </div>
-          {isLive ? (
+          {isFinished ? (
+            <div className="font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+              Final
+            </div>
+          ) : isLive ? (
             <div className="bg-primary/10 px-2 py-0.5 font-headline text-[10px] font-bold uppercase tracking-widest text-primary">
-              {mult} Multiplier
+              LIVE
             </div>
           ) : (
             <div className="font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-              {mult} Multiplier
+              +1 pt if correct
             </div>
           )}
         </div>

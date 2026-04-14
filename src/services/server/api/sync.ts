@@ -1,4 +1,4 @@
-import { Prisma, type MatchStatus } from "@prisma/client";
+import { Prisma, type MatchStatus, type TournamentStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { fetchIplFixtures } from "@/lib/ipl";
 import type { IplFixture } from "@/lib/ipl";
@@ -121,6 +121,56 @@ async function reconcileMatchStatusesForTournamentIds(tournamentIds: string[]) {
   }
 }
 
+/** Derive circle-level status from match rows (updated after each sync). */
+async function updateTournamentStatusesForIds(tournamentIds: string[]) {
+  const unique = [...new Set(tournamentIds.filter(Boolean))];
+  if (unique.length === 0) return;
+
+  for (const tid of unique) {
+    const matches = await prisma.match.findMany({
+      where: { tournamentId: tid },
+      select: { status: true },
+    });
+    if (matches.length === 0) continue;
+
+    let next: TournamentStatus;
+    if (matches.every((m) => m.status === "COMPLETED")) {
+      next = "COMPLETED";
+    } else if (matches.every((m) => m.status === "UPCOMING")) {
+      next = "UPCOMING";
+    } else {
+      next = "ONGOING";
+    }
+
+    await prisma.tournament.update({
+      where: { id: tid },
+      data: { status: next },
+    });
+  }
+}
+
+/** Second fetch if the first fails or returns no scoreboard payload (transient API issues). */
+async function fetchRapidApiMatchLiveWithRetry(iplMatchId: string) {
+  const first = await fetchRapidApiMatchLive(iplMatchId).catch((err) => {
+    console.warn("[match-results] RapidAPI match live fetch failed (1st attempt)", {
+      iplMatchId,
+      err,
+    });
+    return null;
+  });
+  if (first?.scoreboard != null && typeof first.scoreboard === "object") {
+    return first;
+  }
+  await new Promise((r) => setTimeout(r, 1500));
+  return fetchRapidApiMatchLive(iplMatchId).catch((err) => {
+    console.warn("[match-results] RapidAPI match live fetch failed (2nd attempt)", {
+      iplMatchId,
+      err,
+    });
+    return null;
+  });
+}
+
 async function resolveCompletedWinnersForTournamentIds(tournamentIds: string[]) {
   if (tournamentIds.length === 0) return;
 
@@ -159,22 +209,7 @@ async function resolveCompletedWinnersForTournamentIds(tournamentIds: string[]) 
       else if (n.includes(normalizeName(match.team2))) winner = match.team2;
     }
     if (!winner) {
-      const live = await fetchRapidApiMatchLive(match.iplMatchId).catch((err) => {
-        console.warn("[match-results] RapidAPI match live fetch failed", {
-          dbMatchId: match.id,
-          iplMatchId: match.iplMatchId,
-          err,
-        });
-        return null;
-      });
-      console.log("[match-results] RapidAPI match live API response (winner resolution)", {
-        dbMatchId: match.id,
-        iplMatchId: match.iplMatchId,
-        team1: match.team1,
-        team2: match.team2,
-        scoreboard: live?.scoreboard ?? null,
-        commentary: live?.commentary ?? null,
-      });
+      const live = await fetchRapidApiMatchLiveWithRetry(match.iplMatchId);
       winner = inferWinnerFromScoreboard(live?.scoreboard ?? null, match.team1, match.team2);
     }
     if (!winner) continue;
@@ -276,6 +311,7 @@ export async function syncIplFixturesForTournamentIds(tournamentIds: string[]): 
 
   await reconcileMatchStatusesForTournamentIds(ids);
   await resolveCompletedWinnersForTournamentIds(ids);
+  await updateTournamentStatusesForIds(ids);
 }
 
 /**
