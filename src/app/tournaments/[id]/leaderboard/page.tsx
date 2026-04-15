@@ -29,7 +29,9 @@ export default async function TournamentLeaderboardPage({
   if (!data || !tournamentWithMatches) redirect("/tournaments");
 
   const { tournament, leaderboard } = data;
-  const hasLive = tournamentWithMatches.matches.some((m) => m.status === "LIVE");
+  const hasLive = tournamentWithMatches.matches.some(
+    (m) => m.status === "LIVE",
+  );
   const topThree = leaderboard.slice(0, 3);
 
   return (
@@ -57,26 +59,32 @@ export default async function TournamentLeaderboardPage({
           Leaderboard
         </h1>
         <p className="mt-2 text-sm text-on-surface-variant">
-          Full standings for this circle — points from correct match predictions.
+          Full standings for this circle — points from correct match
+          predictions.
         </p>
       </header>
 
       {leaderboard.length === 0 ? (
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 text-center text-sm text-on-surface-variant">
-          No leaderboard entries yet. Play matches and earn points when your picks win.
+          No leaderboard entries yet. Play matches and earn points when your
+          picks win.
         </div>
       ) : (
         <div className="space-y-10">
           {topThree.length > 0 ? (
             <section className="space-y-4">
-              <h2 className="font-display text-sm font-black uppercase tracking-widest text-secondary">Top 3</h2>
+              <h2 className="font-display text-sm font-black uppercase tracking-widest text-secondary">
+                Top 3
+              </h2>
               <div className="grid gap-4 md:grid-cols-3">
                 {topThree.map((row, idx) => (
                   <div
                     key={`${row.userId}-podium-${idx}`}
                     className={[
                       "group relative border border-zinc-800 bg-zinc-900/50 p-1 transition-all hover:border-primary/40",
-                      idx === 0 ? "md:-mt-1 md:shadow-[0_0_24px_rgba(255,215,0,0.12)]" : "",
+                      idx === 0
+                        ? "md:-mt-1 md:shadow-[0_0_24px_rgba(255,215,0,0.12)]"
+                        : "",
                     ].join(" ")}
                   >
                     <div className="border border-zinc-800/50 p-4">
@@ -106,7 +114,9 @@ export default async function TournamentLeaderboardPage({
                             />
                           ) : (
                             <span className="flex h-full w-full items-center justify-center font-headline text-sm font-bold text-zinc-500">
-                              {(row.user.name ?? row.user.email ?? "?").slice(0, 1).toUpperCase()}
+                              {(row.user.name ?? row.user.email ?? "?")
+                                .slice(0, 1)
+                                .toUpperCase()}
                             </span>
                           )}
                         </div>
@@ -116,7 +126,9 @@ export default async function TournamentLeaderboardPage({
                           {row.user.name ?? row.user.email}
                         </div>
                         {row.user.name ? (
-                          <div className="mt-1 truncate font-headline text-[10px] text-zinc-500">{row.user.email}</div>
+                          <div className="mt-1 truncate font-headline text-[10px] text-zinc-500">
+                            {row.user.email}
+                          </div>
                         ) : null}
                         <div
                           className={[
@@ -125,7 +137,9 @@ export default async function TournamentLeaderboardPage({
                           ].join(" ")}
                         >
                           {row.score.toLocaleString()}
-                          <span className="ml-1 text-xs font-bold text-zinc-500">PTS</span>
+                          <span className="ml-1 text-xs font-bold text-zinc-500">
+                            PTS
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -156,7 +170,13 @@ export default async function TournamentLeaderboardPage({
                         isYou ? "bg-primary/10" : "bg-transparent",
                       ].join(" ")}
                     >
-                      <div className={isYou ? "font-black italic text-primary" : "text-zinc-500"}>
+                      <div
+                        className={
+                          isYou
+                            ? "font-black italic text-primary"
+                            : "text-zinc-500"
+                        }
+                      >
                         {String(idx + 1).padStart(2, "0")}
                       </div>
                       <div className="flex min-w-0 items-center gap-3">
@@ -172,7 +192,9 @@ export default async function TournamentLeaderboardPage({
                             />
                           ) : (
                             <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-zinc-500">
-                              {(row.user.name ?? row.user.email ?? "?").slice(0, 1).toUpperCase()}
+                              {(row.user.name ?? row.user.email ?? "?")
+                                .slice(0, 1)
+                                .toUpperCase()}
                             </span>
                           )}
                         </div>
@@ -181,11 +203,15 @@ export default async function TournamentLeaderboardPage({
                             {row.user.name ?? row.user.email}
                           </div>
                           {row.user.name ? (
-                            <div className="truncate text-[10px] text-zinc-500">{row.user.email}</div>
+                            <div className="truncate text-[10px] text-zinc-500">
+                              {row.user.email}
+                            </div>
                           ) : null}
                         </div>
                       </div>
-                      <div className="text-right font-black tabular-nums text-on-surface">{row.score.toLocaleString()}</div>
+                      <div className="text-right font-black tabular-nums text-on-surface">
+                        {row.score.toLocaleString()}
+                      </div>
                     </div>
                   );
                 })}

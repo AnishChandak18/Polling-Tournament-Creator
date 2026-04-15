@@ -10,7 +10,14 @@ export default function LiveArenaTopBar({ avatarUrl, points, userName }) {
       <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-primary-container">
           {avatarUrl ? (
-            <Image src={avatarUrl} alt="" width={32} height={32} className="h-full w-full object-cover" unoptimized />
+            <Image
+              src={avatarUrl}
+              alt=""
+              width={32}
+              height={32}
+              className="h-full w-full object-cover"
+              unoptimized
+            />
           ) : (
             <span className="font-headline text-xs font-bold text-on-primary-container">
               {(userName || "?").slice(0, 1).toUpperCase()}
@@ -23,7 +30,10 @@ export default function LiveArenaTopBar({ avatarUrl, points, userName }) {
       </Link>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1">
-          <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
+          <span
+            className="material-symbols-outlined text-sm text-primary"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
             stars
           </span>
           <span className="font-headline text-sm font-bold tracking-tighter text-yellow-400">

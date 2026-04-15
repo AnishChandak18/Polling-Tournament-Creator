@@ -12,7 +12,11 @@ import { Alert } from "@/components/ui/Alert";
 import { patchMe } from "@/services/api";
 import { navigateSpa } from "@/lib/client-navigation";
 
-export default function OnboardingClient({ initialUsername, initialName, points = 0 }) {
+export default function OnboardingClient({
+  initialUsername,
+  initialName,
+  points = 0,
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/dashboard";
@@ -46,7 +50,12 @@ export default function OnboardingClient({ initialUsername, initialName, points 
   }
 
   return (
-    <PageShell active="home" maxWidth="max-w-xl" className="relative px-4" rightSlot={<PointsChip points={points} />}>
+    <PageShell
+      active="home"
+      maxWidth="max-w-xl"
+      className="relative px-4"
+      rightSlot={<PointsChip points={points} />}
+    >
       <div className="relative mb-10 space-y-2 border-l-4 border-primary-container pl-6">
         <h1 className="font-display text-4xl font-black uppercase leading-none tracking-tighter text-on-surface md:text-5xl">
           Create your <br /> <span className="text-primary">Profile</span>
@@ -76,13 +85,17 @@ export default function OnboardingClient({ initialUsername, initialName, points 
             <span className="material-symbols-outlined text-sm">person</span>
             Username
           </label>
-          <span className="font-display text-[10px] uppercase text-zinc-600">Required</span>
+          <span className="font-display text-[10px] uppercase text-zinc-600">
+            Required
+          </span>
         </header>
 
         <form className="space-y-5" onSubmit={onSubmit}>
           <FormField label="Handle" htmlFor="onb-username">
             <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">@</span>
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
+                @
+              </span>
               <Input
                 id="onb-username"
                 autoComplete="username"
@@ -92,7 +105,9 @@ export default function OnboardingClient({ initialUsername, initialName, points 
                 className="border-2 border-zinc-800 bg-zinc-950 pl-8 focus-visible:border-primary-container"
               />
             </div>
-            <p className="mt-1 text-xs text-on-surface-variant">Letters, numbers, underscores only. 3–20 characters.</p>
+            <p className="mt-1 text-xs text-on-surface-variant">
+              Letters, numbers, underscores only. 3–20 characters.
+            </p>
           </FormField>
 
           <FormField label="Display name" htmlFor="onb-name">
@@ -108,7 +123,12 @@ export default function OnboardingClient({ initialUsername, initialName, points 
 
           {error ? <Alert>{error}</Alert> : null}
 
-          <Button type="submit" variant="stadium" disabled={loading} className="w-full py-4 font-display uppercase tracking-widest">
+          <Button
+            type="submit"
+            variant="stadium"
+            disabled={loading}
+            className="w-full py-4 font-display uppercase tracking-widest"
+          >
             {loading ? "Saving…" : "Enter arena"}
           </Button>
         </form>

@@ -4,7 +4,11 @@ import Link from "next/link";
  * Stitch — Live Standings snapshot (leaderboard rows + Full Leaderboard link).
  * Shell matches MatchVoteCard: zinc border + inner panel.
  */
-export default function CircleArenaLeaderboard({ tournamentId, userRank, rows }) {
+export default function CircleArenaLeaderboard({
+  tournamentId,
+  userRank,
+  rows,
+}) {
   const rankLabel = userRank != null ? `#${userRank}` : "—";
 
   return (
@@ -25,12 +29,16 @@ export default function CircleArenaLeaderboard({ tournamentId, userRank, rows })
             className="inline-flex items-center gap-1 text-[10px] font-headline font-bold uppercase tracking-widest text-primary"
           >
             Full Leaderboard
-            <span className="material-symbols-outlined text-xs">arrow_forward_ios</span>
+            <span className="material-symbols-outlined text-xs">
+              arrow_forward_ios
+            </span>
           </Link>
         </div>
 
         {rows.length === 0 ? (
-          <p className="relative z-10 text-sm text-zinc-500">No standings yet.</p>
+          <p className="relative z-10 text-sm text-zinc-500">
+            No standings yet.
+          </p>
         ) : (
           <div className="relative z-10 space-y-3">
             {rows.map((row, i) => (
@@ -54,7 +62,11 @@ export default function CircleArenaLeaderboard({ tournamentId, userRank, rows })
                   </span>
                   <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full border border-zinc-700 bg-zinc-800">
                     {row.avatarUrl ? (
-                      <img src={row.avatarUrl} alt="" className="h-full w-full object-cover" />
+                      <img
+                        src={row.avatarUrl}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-zinc-500">
                         {row.displayName.slice(0, 1).toUpperCase()}

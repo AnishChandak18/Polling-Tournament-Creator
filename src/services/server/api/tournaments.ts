@@ -42,59 +42,59 @@ export async function createTournamentForCurrentUser(input: {
   return { tournamentId: tournament.id };
 }
 
+const tournamentDetailSelect = {
+  id: true,
+  name: true,
+  season: true,
+  type: true,
+  status: true,
+  ownerId: true,
+  matches: {
+    orderBy: { matchDate: "asc" as const },
+    select: {
+      id: true,
+      iplMatchId: true,
+      matchDate: true,
+      venue: true,
+      team1: true,
+      team2: true,
+      displayMeta: true,
+      status: true,
+      winnerTeam: true,
+    },
+  },
+} as const;
+
 export async function getTournamentForCurrentUserById(tournamentId: string) {
   const user = await getCurrentUserOrThrow();
 
-  const allowed = await prisma.tournament.findFirst({
-    where: {
-      id: tournamentId,
-      OR: [{ ownerId: user.id }, { members: { some: { userId: user.id } } }],
-    },
-    select: { id: true },
-  });
-  if (!allowed) {
-    throw new HttpError("Not found", 404);
-  }
+  const accessWhere = {
+    id: tournamentId,
+    OR: [{ ownerId: user.id }, { members: { some: { userId: user.id } } }],
+  };
 
-  if (!(await isUserFixtureSyncFresh(user.id))) {
-    await upsertIplFixturesForTournament(allowed.id);
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastFixtureSyncAt: new Date() },
-    });
-  }
-
-  const tournament = await prisma.tournament.findFirst({
-    where: {
-      id: tournamentId,
-      OR: [{ ownerId: user.id }, { members: { some: { userId: user.id } } }],
-    },
-    select: {
-      id: true,
-      name: true,
-      season: true,
-      type: true,
-      status: true,
-      ownerId: true,
-      matches: {
-        orderBy: { matchDate: "asc" },
-        select: {
-          id: true,
-          iplMatchId: true,
-          matchDate: true,
-          venue: true,
-          team1: true,
-          team2: true,
-          displayMeta: true,
-          status: true,
-          winnerTeam: true,
-        },
-      },
-    },
+  let tournament = await prisma.tournament.findFirst({
+    where: accessWhere,
+    select: tournamentDetailSelect,
   });
 
   if (!tournament) {
     throw new HttpError("Not found", 404);
+  }
+
+  if (!(await isUserFixtureSyncFresh(user.id))) {
+    await upsertIplFixturesForTournament(tournament.id);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastFixtureSyncAt: new Date() },
+    });
+    tournament = await prisma.tournament.findFirst({
+      where: accessWhere,
+      select: tournamentDetailSelect,
+    });
+    if (!tournament) {
+      throw new HttpError("Not found", 404);
+    }
   }
 
   return { tournament };

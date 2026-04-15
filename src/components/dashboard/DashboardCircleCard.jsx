@@ -41,11 +41,19 @@ export default function DashboardCircleCard({ href, name, index = 0 }) {
             {icon}
           </span>
         </div>
-        <p className="text-sm font-bold leading-tight text-on-surface">{name}</p>
+        <p className="text-sm font-bold leading-tight text-on-surface">
+          {name}
+        </p>
       </div>
       <div className="relative z-10 flex -space-x-2">
-        <div className="h-6 w-6 rounded-full border-2 border-surface-container bg-zinc-700" title="" />
-        <div className="h-6 w-6 rounded-full border-2 border-surface-container bg-zinc-600" title="" />
+        <div
+          className="h-6 w-6 rounded-full border-2 border-surface-container bg-zinc-700"
+          title=""
+        />
+        <div
+          className="h-6 w-6 rounded-full border-2 border-surface-container bg-zinc-600"
+          title=""
+        />
         <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-surface-container bg-zinc-500 text-[8px] font-bold text-on-surface">
           +
         </div>

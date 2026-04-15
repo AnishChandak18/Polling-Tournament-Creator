@@ -24,7 +24,9 @@ export default function CircleArenaInvite({ tournamentId, isOwner }) {
         setInviteUrl(r.inviteUrl);
         setJoinCode(r.joinCode);
       })
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load invite"))
+      .catch((e) =>
+        setError(e instanceof Error ? e.message : "Failed to load invite"),
+      )
       .finally(() => setLoading(false));
   }, [isOwner, tournamentId]);
 
@@ -76,7 +78,8 @@ export default function CircleArenaInvite({ tournamentId, isOwner }) {
             Invites
           </h3>
           <p className="mt-2 text-sm text-zinc-400">
-            Only the circle owner can generate invite links and codes. Ask them to share the circle link with you.
+            Only the circle owner can generate invite links and codes. Ask them
+            to share the circle link with you.
           </p>
         </div>
       </section>
@@ -95,7 +98,8 @@ export default function CircleArenaInvite({ tournamentId, isOwner }) {
           Recruit New Members
         </h3>
         <p className="mb-6 max-w-md text-sm text-zinc-400">
-          Expand the Circle. For every member that joins using your unique kinetic pulse code, you earn{" "}
+          Expand the Circle. For every member that joins using your unique
+          kinetic pulse code, you earn{" "}
           <span className="font-bold text-primary">50 BONUS PTS</span>.
         </p>
         {error ? <Alert className="mb-4">{error}</Alert> : null}
@@ -104,7 +108,9 @@ export default function CircleArenaInvite({ tournamentId, isOwner }) {
         ) : inviteUrl ? (
           <div className="flex gap-2">
             <div className="flex flex-1 items-center justify-between border border-primary/30 bg-zinc-950 px-4 py-3 font-headline font-bold tracking-[0.3em] text-primary">
-              <span className="font-mono text-sm tracking-[0.28em] sm:text-base">{joinCode}</span>
+              <span className="font-mono text-sm tracking-[0.28em] sm:text-base">
+                {joinCode}
+              </span>
               <button
                 type="button"
                 className="material-symbols-outlined text-sm transition-colors hover:text-white"
@@ -138,8 +144,12 @@ export default function CircleArenaInvite({ tournamentId, isOwner }) {
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border-2 border-dashed border-zinc-700 text-zinc-700">
           <span className="material-symbols-outlined text-3xl">add</span>
         </div>
-        <h4 className="font-headline text-xs font-bold uppercase tracking-widest text-zinc-500">Quick Join</h4>
-        <p className="mt-2 text-[10px] uppercase text-zinc-600">Scan QR to sync mobile</p>
+        <h4 className="font-headline text-xs font-bold uppercase tracking-widest text-zinc-500">
+          Quick Join
+        </h4>
+        <p className="mt-2 text-[10px] uppercase text-zinc-600">
+          Scan QR to sync mobile
+        </p>
       </div>
     </section>
   );

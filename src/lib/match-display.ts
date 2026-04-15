@@ -17,11 +17,11 @@ export function asMatchDisplayMeta(value: unknown): MatchDisplayMeta | null {
   return value as MatchDisplayMeta;
 }
 
-/** Group sorted matches by API schedule day label (e.g. "WED, APR 01 2026") or calendar date fallback. */
+/** Group matches by API schedule day label (e.g. "WED, APR 01 2026") or calendar date fallback. Newest day first; within a day, latest kickoff first. */
 export function groupMatchesByScheduleDay<
   T extends { matchDate: Date; displayMeta?: unknown },
 >(matches: T[]): { label: string; matches: T[] }[] {
-  const sorted = [...matches].sort((a, b) => a.matchDate.getTime() - b.matchDate.getTime());
+  const sorted = [...matches].sort((a, b) => b.matchDate.getTime() - a.matchDate.getTime());
   const groups: { label: string; matches: T[] }[] = [];
   for (const m of sorted) {
     const meta = asMatchDisplayMeta(m.displayMeta);

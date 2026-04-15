@@ -33,9 +33,15 @@ function pickCommentaryItems(commentary) {
     .map((item) => {
       if (!item || typeof item !== "object") return null;
       const text =
-        item.commText ?? item.commentary ?? item.text ?? item.msg ?? item.event ?? null;
+        item.commText ??
+        item.commentary ??
+        item.text ??
+        item.msg ??
+        item.event ??
+        null;
       if (typeof text !== "string" || !text.trim()) return null;
-      const over = item.overNumber ?? item.over ?? item.ballNbr ?? item.ballNumber ?? null;
+      const over =
+        item.overNumber ?? item.over ?? item.ballNbr ?? item.ballNumber ?? null;
       return { text: text.trim(), over: over != null ? String(over) : null };
     })
     .filter(Boolean)
@@ -51,7 +57,8 @@ function extractInningsScores(raw) {
 function feedVariant(text) {
   const u = text.toUpperCase();
   if (u.includes("WICKET") || u.includes("OUT")) return "wicket";
-  if (u.includes("FOUR") || u.includes("SIX") || u.includes("BOUNDARY")) return "big";
+  if (u.includes("FOUR") || u.includes("SIX") || u.includes("BOUNDARY"))
+    return "big";
   return "default";
 }
 
@@ -71,16 +78,28 @@ export default function LiveArenaClient({ matchId, team1, team2 }) {
         const path = `/api/matches/${matchId}/live`;
         const res = await fetch(path, { cache: "no-store" });
         const json = await res.json().catch(() => ({}));
-        if (process.env.NODE_ENV !== "production" && typeof window !== "undefined") {
-          console.log("[api response]", { method: "GET", path, status: res.status, ok: res.ok, body: json });
+        if (
+          process.env.NODE_ENV !== "production" &&
+          typeof window !== "undefined"
+        ) {
+          console.log("[api response]", {
+            method: "GET",
+            path,
+            status: res.status,
+            ok: res.ok,
+            body: json,
+          });
         }
-        if (!res.ok) throw new Error(json?.error || "Failed to fetch live match data");
+        if (!res.ok)
+          throw new Error(json?.error || "Failed to fetch live match data");
         if (!active) return;
         setPayload(json);
         setError(null);
       } catch (e) {
         if (!active) return;
-        setError(e instanceof Error ? e.message : "Failed to fetch live match data");
+        setError(
+          e instanceof Error ? e.message : "Failed to fetch live match data",
+        );
       } finally {
         if (active) setLoading(false);
       }
@@ -95,11 +114,11 @@ export default function LiveArenaClient({ matchId, team1, team2 }) {
 
   const scoreLine = useMemo(
     () => pickScoreText(payload?.live?.scoreboard ?? payload?.live),
-    [payload]
+    [payload],
   );
   const commentaryItems = useMemo(
     () => pickCommentaryItems(payload?.live?.commentary ?? payload?.live),
-    [payload]
+    [payload],
   );
 
   const scores = extractInningsScores(scoreLine);
@@ -120,18 +139,30 @@ export default function LiveArenaClient({ matchId, team1, team2 }) {
         </div>
         <div className="relative z-10 flex flex-col items-center justify-between gap-8 md:flex-row">
           <div className="flex-1 text-center">
-            <div className="mb-1 font-headline text-xs uppercase tracking-widest text-zinc-500">{t1}</div>
-            <div className="font-headline text-4xl font-black italic text-on-surface md:text-5xl">{scoreA}</div>
-            <div className="mt-1 text-[10px] uppercase text-zinc-500">20.0 Overs (Target 194)</div>
+            <div className="mb-1 font-headline text-xs uppercase tracking-widest text-zinc-500">
+              {t1}
+            </div>
+            <div className="font-headline text-4xl font-black italic text-on-surface md:text-5xl">
+              {scoreA}
+            </div>
+            <div className="mt-1 text-[10px] uppercase text-zinc-500">
+              20.0 Overs (Target 194)
+            </div>
           </div>
           <div className="flex flex-col items-center">
             <div className="h-12 w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent" />
-            <div className="my-2 font-headline text-xl font-black italic text-primary">VS</div>
+            <div className="my-2 font-headline text-xl font-black italic text-primary">
+              VS
+            </div>
             <div className="h-12 w-px bg-gradient-to-b from-primary/30 via-primary/30 to-transparent" />
           </div>
           <div className="flex-1 text-center">
-            <div className="mb-1 font-headline text-xs uppercase tracking-widest text-zinc-500">{t2}</div>
-            <div className="font-headline text-4xl font-black italic text-primary md:text-5xl">{scoreB}</div>
+            <div className="mb-1 font-headline text-xs uppercase tracking-widest text-zinc-500">
+              {t2}
+            </div>
+            <div className="font-headline text-4xl font-black italic text-primary md:text-5xl">
+              {scoreB}
+            </div>
             <div className="mt-1 text-[10px] font-bold uppercase tracking-tighter text-primary/60">
               Requires 40 from 11 balls
             </div>
@@ -146,35 +177,54 @@ export default function LiveArenaClient({ matchId, team1, team2 }) {
         <div className="space-y-6 lg:col-span-1">
           <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-surface-container p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-headline text-xs font-black uppercase tracking-widest text-zinc-400">On the Crease</h3>
-              <span className="material-symbols-outlined text-lg text-primary">sports_cricket</span>
+              <h3 className="font-headline text-xs font-black uppercase tracking-widest text-zinc-400">
+                On the Crease
+              </h3>
+              <span className="material-symbols-outlined text-lg text-primary">
+                sports_cricket
+              </span>
             </div>
             <div className="space-y-4">
               <div className="flex items-end justify-between border-b border-zinc-800/50 pb-3">
                 <div>
-                  <div className="text-sm font-bold text-on-surface">Striker</div>
-                  <div className="text-[10px] uppercase text-zinc-500">Live feed</div>
+                  <div className="text-sm font-bold text-on-surface">
+                    Striker
+                  </div>
+                  <div className="text-[10px] uppercase text-zinc-500">
+                    Live feed
+                  </div>
                 </div>
                 <div className="text-right">
                   <div className="font-headline text-xl font-black text-primary">
-                    — <span className="text-xs font-normal text-zinc-500">(—)</span>
+                    —{" "}
+                    <span className="text-xs font-normal text-zinc-500">
+                      (—)
+                    </span>
                   </div>
                 </div>
               </div>
               <div className="flex items-end justify-between">
                 <div>
-                  <div className="text-sm font-bold text-zinc-400">Non-Striker</div>
+                  <div className="text-sm font-bold text-zinc-400">
+                    Non-Striker
+                  </div>
                   <div className="text-[10px] uppercase text-zinc-500">—</div>
                 </div>
-                <div className="text-right font-headline text-xl font-black text-zinc-300">—</div>
+                <div className="text-right font-headline text-xl font-black text-zinc-300">
+                  —
+                </div>
               </div>
             </div>
           </div>
 
           <div className="rounded-xl border border-zinc-800 border-l-4 border-l-primary bg-surface-container-high p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-headline text-xs font-black uppercase tracking-widest text-zinc-400">Current Bowler</h3>
-              <span className="material-symbols-outlined text-lg text-primary">sports_baseball</span>
+              <h3 className="font-headline text-xs font-black uppercase tracking-widest text-zinc-400">
+                Current Bowler
+              </h3>
+              <span className="material-symbols-outlined text-lg text-primary">
+                sports_baseball
+              </span>
             </div>
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 overflow-hidden rounded border border-zinc-800 bg-zinc-900" />
@@ -183,7 +233,9 @@ export default function LiveArenaClient({ matchId, team1, team2 }) {
                 <div className="mt-1 grid grid-cols-4 gap-2">
                   {["O", "M", "R", "W"].map((k) => (
                     <div key={k}>
-                      <div className="text-[9px] uppercase text-zinc-500">{k}</div>
+                      <div className="text-[9px] uppercase text-zinc-500">
+                        {k}
+                      </div>
                       <div className="text-xs font-bold">—</div>
                     </div>
                   ))}
@@ -194,7 +246,9 @@ export default function LiveArenaClient({ matchId, team1, team2 }) {
 
           <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-headline text-xs font-black uppercase tracking-widest text-zinc-400">Live Crowd Energy</h3>
+              <h3 className="font-headline text-xs font-black uppercase tracking-widest text-zinc-400">
+                Live Crowd Energy
+              </h3>
               <span className="text-xs font-bold text-primary">108 dB</span>
             </div>
             <div className="flex h-16 items-end gap-1.5">
@@ -219,7 +273,9 @@ export default function LiveArenaClient({ matchId, team1, team2 }) {
           <div className="flex items-center justify-between border-b border-zinc-800 bg-surface-container-high p-4">
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-primary" />
-              <h3 className="font-headline text-xs font-black uppercase tracking-widest text-primary">Technical Feed</h3>
+              <h3 className="font-headline text-xs font-black uppercase tracking-widest text-primary">
+                Technical Feed
+              </h3>
             </div>
             <div className="flex gap-2">
               <button
@@ -242,7 +298,9 @@ export default function LiveArenaClient({ matchId, team1, team2 }) {
             ) : error ? (
               <p className="text-sm text-error">{error}</p>
             ) : commentaryItems.length === 0 ? (
-              <p className="text-sm text-zinc-500">No commentary updates yet.</p>
+              <p className="text-sm text-zinc-500">
+                No commentary updates yet.
+              </p>
             ) : (
               commentaryItems.map((item, idx) => {
                 const v = feedVariant(item.text);
@@ -253,10 +311,17 @@ export default function LiveArenaClient({ matchId, team1, team2 }) {
                       ? "border-l-2 border-primary bg-primary/5"
                       : "border-l-2 border-zinc-800 hover:border-zinc-700";
                 return (
-                  <div key={`${idx}-${item.over ?? "x"}`} className={`flex gap-4 rounded-r-lg p-3 ${border}`}>
-                    <div className="pt-1 font-headline text-xs font-bold text-zinc-500">{item.over ?? "—"}</div>
+                  <div
+                    key={`${idx}-${item.over ?? "x"}`}
+                    className={`flex gap-4 rounded-r-lg p-3 ${border}`}
+                  >
+                    <div className="pt-1 font-headline text-xs font-bold text-zinc-500">
+                      {item.over ?? "—"}
+                    </div>
                     <div className="flex-1">
-                      <p className="text-sm leading-relaxed text-zinc-400">{item.text}</p>
+                      <p className="text-sm leading-relaxed text-zinc-400">
+                        {item.text}
+                      </p>
                     </div>
                   </div>
                 );
@@ -264,8 +329,12 @@ export default function LiveArenaClient({ matchId, team1, team2 }) {
             )}
             {scoreLine && (
               <div className="rounded-lg border border-zinc-800 bg-zinc-950/80 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Raw scoreboard</p>
-                <p className="mt-2 font-headline text-xs font-bold text-on-surface">{scoreLine}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                  Raw scoreboard
+                </p>
+                <p className="mt-2 font-headline text-xs font-bold text-on-surface">
+                  {scoreLine}
+                </p>
               </div>
             )}
           </div>

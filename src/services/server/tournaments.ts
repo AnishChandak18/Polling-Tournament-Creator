@@ -1,9 +1,10 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { DatabaseUnavailableError, isPrismaDbUnavailableError } from "@/lib/prisma-errors";
 import { upsertIplFixturesForTournament } from "@/services/server/api/sync";
 import { isUserFixtureSyncFresh } from "@/services/server/fixture-sync";
 
-export async function listUserTournaments(
+async function listUserTournamentsImpl(
   userId: string,
   options?: { take?: number; includeUpcomingMatch?: boolean }
 ) {
@@ -35,6 +36,9 @@ export async function listUserTournaments(
   });
 }
 
+/** Dedupes list queries when several server components request the same user's tournaments in one RSC tree. */
+export const listUserTournaments = cache(listUserTournamentsImpl);
+
 export async function getTournamentForUser(
   tournamentId: string,
   userId: string
@@ -48,57 +52,61 @@ export async function getTournamentForUser(
   });
 }
 
+function tournamentWithMatchesSelect(userId: string) {
+  return {
+    id: true,
+    name: true,
+    season: true,
+    ownerId: true,
+    matches: {
+      orderBy: { matchDate: "asc" as const },
+      select: {
+        id: true,
+        matchDate: true,
+        venue: true,
+        team1: true,
+        team2: true,
+        displayMeta: true,
+        status: true,
+        winnerTeam: true,
+        votes: {
+          where: { userId },
+          select: { teamVoted: true },
+        },
+      },
+    },
+  } as const;
+}
+
 export async function getTournamentWithMatchesForUser(
   tournamentId: string,
   userId: string
 ) {
   try {
-    const allowed = await prisma.tournament.findFirst({
-      where: {
-        id: tournamentId,
-        OR: [{ ownerId: userId }, { members: { some: { userId } } }],
-      },
-      select: { id: true },
+    const accessWhere = {
+      id: tournamentId,
+      OR: [{ ownerId: userId }, { members: { some: { userId } } }],
+    };
+
+    let tournament = await prisma.tournament.findFirst({
+      where: accessWhere,
+      select: tournamentWithMatchesSelect(userId),
     });
-    if (!allowed) return null;
+    if (!tournament) return null;
 
     if (!(await isUserFixtureSyncFresh(userId))) {
-      await upsertIplFixturesForTournament(allowed.id);
+      await upsertIplFixturesForTournament(tournament.id);
       await prisma.user.update({
         where: { id: userId },
         data: { lastFixtureSyncAt: new Date() },
       });
+      tournament = await prisma.tournament.findFirst({
+        where: accessWhere,
+        select: tournamentWithMatchesSelect(userId),
+      });
     }
 
-    return await prisma.tournament.findFirst({
-      where: {
-        id: tournamentId,
-        OR: [{ ownerId: userId }, { members: { some: { userId } } }],
-      },
-      select: {
-        id: true,
-        name: true,
-        season: true,
-        ownerId: true,
-        matches: {
-          orderBy: { matchDate: "asc" },
-          select: {
-            id: true,
-            matchDate: true,
-            venue: true,
-            team1: true,
-            team2: true,
-            displayMeta: true,
-            status: true,
-            winnerTeam: true,
-            votes: {
-              where: { userId },
-              select: { teamVoted: true },
-            },
-          },
-        },
-      },
-    });
+    return tournament;
   } catch (e) {
     if (isPrismaDbUnavailableError(e)) {
       throw new DatabaseUnavailableError();
@@ -130,18 +138,28 @@ export async function getTournamentLeaderboardForUser(
   tournamentId: string,
   userId: string
 ) {
-  const tournament = await getTournamentForUser(tournamentId, userId);
-  if (!tournament) return null;
-
-  const leaderboard = await prisma.tournamentMember.findMany({
-    where: { tournamentId: tournament.id },
-    orderBy: [{ score: "desc" }, { createdAt: "asc" }],
+  const row = await prisma.tournament.findFirst({
+    where: {
+      id: tournamentId,
+      OR: [{ ownerId: userId }, { members: { some: { userId } } }],
+    },
     select: {
-      userId: true,
-      score: true,
-      user: { select: { name: true, email: true, avatarUrl: true } },
+      id: true,
+      name: true,
+      members: {
+        orderBy: [{ score: "desc" }, { createdAt: "asc" }],
+        select: {
+          userId: true,
+          score: true,
+          user: { select: { name: true, email: true, avatarUrl: true } },
+        },
+      },
     },
   });
+  if (!row) return null;
+
+  const tournament = { id: row.id, name: row.name };
+  const leaderboard = row.members;
 
   return { tournament, leaderboard };
 }

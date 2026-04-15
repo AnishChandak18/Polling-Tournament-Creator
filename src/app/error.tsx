@@ -2,7 +2,7 @@
 
 import { AppErrorFallback } from "@/components/errors/AppErrorFallback";
 
-export default function TournamentDetailError({
+export default function RootError({
   error,
   reset,
 }: {
@@ -13,7 +13,10 @@ export default function TournamentDetailError({
     <AppErrorFallback
       error={error}
       reset={reset}
-      secondaryLinks={[{ href: "/tournaments", label: "Back to circles" }]}
+      secondaryLinks={[
+        { href: "/", label: "Home" },
+        { href: "/dashboard", label: "Dashboard" },
+      ]}
     />
   );
 }

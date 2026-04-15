@@ -57,7 +57,9 @@ export default async function Home() {
 
         <section className="mt-12 w-full text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-outline-variant/50 bg-surface-container-high px-3 py-1">
-            <span className="material-symbols-outlined text-[16px] text-primary-container">verified</span>
+            <span className="material-symbols-outlined text-[16px] text-primary-container">
+              verified
+            </span>
             <span className="font-display text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
               Pure Skill • No Stakes
             </span>
@@ -68,7 +70,9 @@ export default async function Home() {
             <span className="text-primary-container">FOR THE FUN.</span>
           </h2>
           <p className="mt-4 px-4 text-sm leading-relaxed text-on-surface-variant">
-            The ultimate IPL prediction playground. Rise through the rankings, earn bragging rights, and feel the adrenaline of every match—strictly for the love of the game.
+            The ultimate IPL prediction playground. Rise through the rankings,
+            earn bragging rights, and feel the adrenaline of every
+            match—strictly for the love of the game.
           </p>
         </section>
 
@@ -78,21 +82,35 @@ export default async function Home() {
             className="btn-primary flex w-full items-center justify-center gap-2 py-4 text-base"
           >
             <span>Get Started</span>
-            <span className="material-symbols-outlined font-bold">arrow_forward</span>
+            <span className="material-symbols-outlined font-bold">
+              arrow_forward
+            </span>
           </Link>
 
           <div className="grid grid-cols-3 gap-4 border-t border-outline-variant/20 pt-8">
             <div className="text-center">
-              <p className="font-display text-lg font-bold leading-none text-primary-container">500K+</p>
-              <p className="mt-1 text-[9px] font-medium uppercase tracking-widest text-on-surface-variant">Players</p>
+              <p className="font-display text-lg font-bold leading-none text-primary-container">
+                500K+
+              </p>
+              <p className="mt-1 text-[9px] font-medium uppercase tracking-widest text-on-surface-variant">
+                Players
+              </p>
             </div>
             <div className="border-x border-outline-variant/20 text-center">
-              <p className="font-display text-lg font-bold leading-none text-primary-container">₹0</p>
-              <p className="mt-1 text-[9px] font-medium uppercase tracking-widest text-on-surface-variant">Entry Fee</p>
+              <p className="font-display text-lg font-bold leading-none text-primary-container">
+                ₹0
+              </p>
+              <p className="mt-1 text-[9px] font-medium uppercase tracking-widest text-on-surface-variant">
+                Entry Fee
+              </p>
             </div>
             <div className="text-center">
-              <p className="font-display text-lg font-bold leading-none text-primary-container">IPL</p>
-              <p className="mt-1 text-[9px] font-medium uppercase tracking-widest text-on-surface-variant">Live</p>
+              <p className="font-display text-lg font-bold leading-none text-primary-container">
+                IPL
+              </p>
+              <p className="mt-1 text-[9px] font-medium uppercase tracking-widest text-on-surface-variant">
+                Live
+              </p>
             </div>
           </div>
         </section>
@@ -106,7 +124,8 @@ export default async function Home() {
               Private Squad Leaderboards
             </h3>
             <p className="mt-3 text-sm text-on-surface-variant">
-              Create exclusive circles for your friends, family, or colleagues and dominate the ranks.
+              Create exclusive circles for your friends, family, or colleagues
+              and dominate the ranks.
             </p>
           </div>
           <div className="glass-card p-6">
@@ -117,7 +136,8 @@ export default async function Home() {
               Predict Match Outcomes
             </h3>
             <p className="mt-3 text-sm text-on-surface-variant">
-              Dive into live stats and make your call each matchday to climb rankings.
+              Dive into live stats and make your call each matchday to climb
+              rankings.
             </p>
           </div>
           <div className="glass-card p-6">
@@ -128,7 +148,8 @@ export default async function Home() {
               For Glory, For Fun
             </h3>
             <p className="mt-3 text-sm text-on-surface-variant">
-              Level up your profile, earn badges, and compete for bragging rights.
+              Level up your profile, earn badges, and compete for bragging
+              rights.
             </p>
           </div>
         </section>

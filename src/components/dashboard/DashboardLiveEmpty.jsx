@@ -11,17 +11,28 @@ export default function DashboardLiveEmpty() {
             <span className="rounded bg-surface-container px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
               Fixtures
             </span>
-            <span className="text-xs font-medium text-on-surface-variant">Indian Premier League</span>
+            <span className="text-xs font-medium text-on-surface-variant">
+              Indian Premier League
+            </span>
           </div>
           <p className="text-sm leading-relaxed text-on-surface-variant">
-            No upcoming match is synced in your circles yet. Open predictions or create a circle to get started.
+            No upcoming match is synced in your circles yet. Open predictions or
+            create a circle to get started.
           </p>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <Link href="/predictions" className="btn-primary pulse-shadow flex flex-1 items-center justify-center gap-2 py-4 text-sm uppercase tracking-widest">
-              <span className="material-symbols-outlined text-xl">query_stats</span>
+            <Link
+              href="/predictions"
+              className="btn-primary pulse-shadow flex flex-1 items-center justify-center gap-2 py-4 text-sm uppercase tracking-widest"
+            >
+              <span className="material-symbols-outlined text-xl">
+                query_stats
+              </span>
               Predictions
             </Link>
-            <Link href="/tournaments/create" className="btn-outline flex flex-1 justify-center py-4 text-sm uppercase tracking-widest">
+            <Link
+              href="/tournaments/create"
+              className="btn-outline flex flex-1 justify-center py-4 text-sm uppercase tracking-widest"
+            >
               Create circle
             </Link>
           </div>

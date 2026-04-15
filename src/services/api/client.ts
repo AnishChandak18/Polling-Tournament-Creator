@@ -30,14 +30,22 @@ export async function apiRequest<T>(
   path: string,
   { method = "GET", body, headers = {} }: ApiRequestOptions = {}
 ): Promise<T> {
-  const res = await fetch(path, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      ...headers,
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let res: Response;
+  try {
+    res = await fetch(path, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers,
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch {
+    throw new ApiError(
+      "Network error. Check your connection and try again.",
+      0,
+    );
+  }
 
   const json = await res.json().catch(() => ({}));
   logDevToolsApiResponse(method, path, res.status, res.ok, json);

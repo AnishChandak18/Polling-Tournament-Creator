@@ -25,7 +25,11 @@ export default function CircleArenaBottomNav({ active = "circles" }) {
           >
             <span
               className="material-symbols-outlined"
-              style={isActive && key === "circles" ? { fontVariationSettings: "'FILL' 1" } : undefined}
+              style={
+                isActive && key === "circles"
+                  ? { fontVariationSettings: "'FILL' 1" }
+                  : undefined
+              }
             >
               {icon}
             </span>

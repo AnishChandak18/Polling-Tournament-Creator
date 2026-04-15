@@ -27,6 +27,7 @@ export default function CreateTournamentPage() {
       await navigateSpa(router, `/tournaments/${json.tournamentId}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error");
+    } finally {
       setSaving(false);
     }
   }
