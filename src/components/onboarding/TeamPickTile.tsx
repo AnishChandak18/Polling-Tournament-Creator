@@ -12,21 +12,14 @@ type TeamPickTileProps = {
 };
 
 /** Compact square tile for IPL team selection — shows official crest + label. */
-export function TeamPickTile({
-  name,
-  logo,
-  selected,
-  onSelect,
-}: TeamPickTileProps) {
+export function TeamPickTile({ name, logo, selected, onSelect }: TeamPickTileProps) {
   return (
     <button
       type="button"
       onClick={onSelect}
       className={cn(
         "relative flex aspect-square flex-col overflow-hidden rounded-xl border border-outline-variant bg-surface-container-high text-left transition-all active:scale-95 dark:bg-surface-container",
-        selected
-          ? "ring-2 ring-primary shadow-md"
-          : "hover:ring-2 hover:ring-outline-variant",
+        selected ? "ring-2 ring-primary shadow-md" : "hover:ring-2 hover:ring-outline-variant"
       )}
     >
       <div className="relative min-h-0 flex-1 w-full">
@@ -45,9 +38,7 @@ export function TeamPickTile({
       </div>
       {selected ? (
         <div className="absolute right-2 top-2 z-30 flex h-5 w-5 items-center justify-center rounded-full bg-primary">
-          <span className="material-symbols-outlined text-[12px] text-on-primary">
-            check
-          </span>
+          <span className="material-symbols-outlined text-[12px] text-on-primary">check</span>
         </div>
       ) : null}
     </button>

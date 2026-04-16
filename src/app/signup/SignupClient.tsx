@@ -104,38 +104,27 @@ export default function SignupClient() {
         <div className="grid grid-cols-1 lg:grid-cols-2">
           <div className="relative hidden flex-col justify-between overflow-hidden bg-surface-container-lowest p-10 lg:flex">
             <div className="relative z-10">
-              <h1 className="font-display text-3xl font-black italic tracking-widest text-primary">
-                STADIUM PULSE
-              </h1>
+              <h1 className="font-display text-3xl font-black italic tracking-widest text-primary">STADIUM PULSE</h1>
               <div className="mt-20">
                 <h2 className="font-display text-5xl font-black uppercase leading-tight tracking-tighter">
                   Join the <br />
                   <span className="text-primary">Arena</span>
                 </h2>
                 <p className="mt-6 max-w-sm text-lg leading-relaxed text-on-surface-variant">
-                  Initialize your tactical dashboard and gain access to
-                  high-velocity sports data, circle metrics, and live predictive
-                  grids.
+                  Initialize your tactical dashboard and gain access to high-velocity sports data, circle metrics, and live
+                  predictive grids.
                 </p>
               </div>
             </div>
             <div className="relative z-10 flex items-center gap-8">
               <div className="flex flex-col">
-                <span className="font-display text-2xl font-bold text-primary">
-                  Live
-                </span>
-                <span className="text-xs uppercase tracking-widest text-on-surface-variant">
-                  Season updates
-                </span>
+                <span className="font-display text-2xl font-bold text-primary">Live</span>
+                <span className="text-xs uppercase tracking-widest text-on-surface-variant">Season updates</span>
               </div>
               <div className="h-8 w-px bg-outline-variant" />
               <div className="flex flex-col">
-                <span className="font-display text-2xl font-bold text-primary">
-                  Circles
-                </span>
-                <span className="text-xs uppercase tracking-widest text-on-surface-variant">
-                  Private leagues
-                </span>
+                <span className="font-display text-2xl font-bold text-primary">Circles</span>
+                <span className="text-xs uppercase tracking-widest text-on-surface-variant">Private leagues</span>
               </div>
             </div>
             <div className="pointer-events-none absolute bottom-0 right-0 h-full w-full translate-x-1/4 translate-y-1/4 opacity-20">
@@ -145,30 +134,19 @@ export default function SignupClient() {
 
           <div className="glass-card border-l border-outline-variant/30 p-8 md:p-12 lg:p-16">
             <div className="mb-8 lg:hidden">
-              <h1 className="font-display text-2xl font-black italic tracking-widest text-primary">
-                STADIUM PULSE
-              </h1>
-              <h2 className="mt-6 font-display text-4xl font-black uppercase tracking-tighter">
-                Join the Arena
-              </h2>
+              <h1 className="font-display text-2xl font-black italic tracking-widest text-primary">STADIUM PULSE</h1>
+              <h2 className="mt-6 font-display text-4xl font-black uppercase tracking-tighter">Join the Arena</h2>
             </div>
 
             {checkEmail ? (
               <div className="rounded-xl border border-primary/30 bg-primary/5 p-6 text-center text-sm text-on-surface">
-                <p className="font-display font-bold uppercase tracking-widest text-primary">
-                  Check your email
-                </p>
+                <p className="font-display font-bold uppercase tracking-widest text-primary">Check your email</p>
                 <p className="mt-2 text-on-surface-variant">
-                  We sent a confirmation link to{" "}
-                  <span className="font-medium text-on-surface">{email}</span>.
-                  Open it to finish creating your account.
+                  We sent a confirmation link to <span className="font-medium text-on-surface">{email}</span>. Open it to
+                  finish creating your account.
                 </p>
                 <Link
-                  href={
-                    next === "/dashboard"
-                      ? "/login"
-                      : `/login?next=${encodeURIComponent(next)}`
-                  }
+                  href={next === "/dashboard" ? "/login" : `/login?next=${encodeURIComponent(next)}`}
                   className="btn-outline mt-6 inline-flex w-full justify-center py-3 text-sm"
                 >
                   Back to login
@@ -179,13 +157,9 @@ export default function SignupClient() {
                 <header className="space-y-2">
                   <div className="flex items-center gap-2 text-primary">
                     <span className="h-0.5 w-8 bg-primary" />
-                    <span className="font-display text-xs font-bold uppercase tracking-widest">
-                      Create Your Account
-                    </span>
+                    <span className="font-display text-xs font-bold uppercase tracking-widest">Create Your Account</span>
                   </div>
-                  <h3 className="font-display text-xl font-bold uppercase tracking-tight">
-                    Personal Details
-                  </h3>
+                  <h3 className="font-display text-xl font-bold uppercase tracking-tight">Personal Details</h3>
                 </header>
 
                 <form className="mt-8 space-y-6" onSubmit={signUp}>
@@ -270,10 +244,7 @@ export default function SignupClient() {
                     />
                     <span className="text-sm leading-tight text-on-surface-variant">
                       I agree to the{" "}
-                      <Link
-                        href="/"
-                        className="font-bold text-primary underline-offset-4 hover:underline"
-                      >
+                      <Link href="/" className="font-bold text-primary underline-offset-4 hover:underline">
                         terms of service
                       </Link>{" "}
                       and privacy policy.
@@ -286,9 +257,7 @@ export default function SignupClient() {
                     className="btn-primary flex w-full items-center justify-center gap-3 py-4 text-sm uppercase tracking-widest"
                   >
                     {submitLoading ? "Creating..." : "Create account"}
-                    <span className="material-symbols-outlined text-lg">
-                      stadium
-                    </span>
+                    <span className="material-symbols-outlined text-lg">stadium</span>
                   </button>
 
                   <div className="relative py-4">
@@ -296,9 +265,7 @@ export default function SignupClient() {
                       <div className="w-full border-t border-outline-variant/30" />
                     </div>
                     <div className="relative flex justify-center text-[10px] font-bold uppercase tracking-widest">
-                      <span className="bg-surface-container-low px-4 text-zinc-500">
-                        OR JOIN VIA HUB
-                      </span>
+                      <span className="bg-surface-container-low px-4 text-zinc-500">OR JOIN VIA HUB</span>
                     </div>
                   </div>
 
@@ -320,20 +287,14 @@ export default function SignupClient() {
                 <p className="text-sm text-zinc-500">
                   Already have an account?{" "}
                   <Link
-                    href={
-                      next === "/dashboard"
-                        ? "/login"
-                        : `/login?next=${encodeURIComponent(next)}`
-                    }
+                    href={next === "/dashboard" ? "/login" : `/login?next=${encodeURIComponent(next)}`}
                     className="font-bold text-primary underline decoration-2 underline-offset-4 hover:underline"
                   >
                     Log in
                   </Link>
                 </p>
                 <div className="flex items-center justify-center gap-2 border-t border-outline-variant/20 pt-6 text-[10px] font-bold uppercase tracking-widest text-zinc-600">
-                  <span className="material-symbols-outlined text-sm">
-                    info
-                  </span>
+                  <span className="material-symbols-outlined text-sm">info</span>
                   POINTS FOR FUN ONLY
                 </div>
               </div>

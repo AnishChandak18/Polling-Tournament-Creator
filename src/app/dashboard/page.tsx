@@ -22,14 +22,7 @@ export default async function DashboardPage() {
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
 
-  const [
-    tournaments,
-    totalPoints,
-    bestRank,
-    predictionCount,
-    activity,
-    liveArena,
-  ] = await Promise.all([
+  const [tournaments, totalPoints, bestRank, predictionCount, activity, liveArena] = await Promise.all([
     listUserTournaments(dbUser.id, {
       take: 8,
       includeUpcomingMatch: true,
@@ -42,20 +35,12 @@ export default async function DashboardPage() {
   ]);
 
   const spotlight = tournaments
-    .map((t) =>
-      t.matches?.[0] ? { tournament: t, match: t.matches[0] } : null,
-    )
+    .map((t) => (t.matches?.[0] ? { tournament: t, match: t.matches[0] } : null))
     .find(Boolean);
 
-  const predictHref = spotlight
-    ? `/tournaments/${spotlight.tournament.id}/vote`
-    : "/predictions";
-  const historyHref = tournaments[0]
-    ? `/tournaments/${tournaments[0].id}/history`
-    : null;
-  const liveHref = liveArena
-    ? `/tournaments/${liveArena.tournamentId}/live`
-    : null;
+  const predictHref = spotlight ? `/tournaments/${spotlight.tournament.id}/vote` : "/predictions";
+  const historyHref = tournaments[0] ? `/tournaments/${tournaments[0].id}/history` : null;
+  const liveHref = liveArena ? `/tournaments/${liveArena.tournamentId}/live` : null;
   const spotlightLiveArenaHref =
     spotlight &&
     spotlight.match.status === "LIVE" &&
@@ -65,9 +50,7 @@ export default async function DashboardPage() {
 
   const rankLabel = bestRank != null ? `#${bestRank}` : "—";
   const rankSub =
-    bestRank != null
-      ? "Best among your circles"
-      : "Join a circle to get ranked";
+    bestRank != null ? "Best among your circles" : "Join a circle to get ranked";
 
   return (
     <PageShell
@@ -85,8 +68,7 @@ export default async function DashboardPage() {
               matchDate={new Date(spotlight.match.matchDate)}
               season={spotlight.tournament.season}
               isLiveDay={
-                spotlight.match.status === "LIVE" ||
-                isTodayIst(new Date(spotlight.match.matchDate))
+                spotlight.match.status === "LIVE" || isTodayIst(new Date(spotlight.match.matchDate))
               }
               predictHref={predictHref}
               liveArenaHref={spotlightLiveArenaHref}
@@ -101,9 +83,7 @@ export default async function DashboardPage() {
               href="/results"
               className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-surface-container-high px-3 py-2 font-display text-[10px] font-bold uppercase tracking-widest text-on-surface transition-colors hover:border-primary/40 hover:text-primary-container"
             >
-              <span className="material-symbols-outlined text-base text-primary-container">
-                emoji_events
-              </span>
+              <span className="material-symbols-outlined text-base text-primary-container">emoji_events</span>
               Results
             </Link>
             {historyHref ? (
@@ -111,9 +91,7 @@ export default async function DashboardPage() {
                 href={historyHref}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-surface-container-high px-3 py-2 font-display text-[10px] font-bold uppercase tracking-widest text-on-surface transition-colors hover:border-primary/40 hover:text-primary-container"
               >
-                <span className="material-symbols-outlined text-base text-primary-container">
-                  history
-                </span>
+                <span className="material-symbols-outlined text-base text-primary-container">history</span>
                 Match history
               </Link>
             ) : null}
@@ -137,25 +115,17 @@ export default async function DashboardPage() {
                 Best rank
               </p>
               <div className="flex items-baseline gap-1">
-                <span className="font-display text-3xl font-black text-primary-container">
-                  {rankLabel}
-                </span>
+                <span className="font-display text-3xl font-black text-primary-container">{rankLabel}</span>
               </div>
-              <p className="mt-2 text-[10px] font-bold leading-snug text-on-surface-variant">
-                {rankSub}
-              </p>
+              <p className="mt-2 text-[10px] font-bold leading-snug text-on-surface-variant">{rankSub}</p>
             </div>
             <div className="flex flex-col justify-between rounded-lg border border-zinc-800 bg-surface-container-high p-4">
               <div>
                 <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
                   Predictions
                 </p>
-                <p className="font-display text-3xl font-black text-on-surface">
-                  {predictionCount}
-                </p>
-                <p className="mt-1 text-[10px] font-bold text-on-surface-variant">
-                  All-time picks
-                </p>
+                <p className="font-display text-3xl font-black text-on-surface">{predictionCount}</p>
+                <p className="mt-1 text-[10px] font-bold text-on-surface-variant">All-time picks</p>
               </div>
             </div>
           </section>
@@ -163,9 +133,7 @@ export default async function DashboardPage() {
           <section className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950">
             <div className="flex items-center justify-between border-b border-zinc-800 p-5">
               <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-primary-container">
-                  query_stats
-                </span>
+                <span className="material-symbols-outlined text-primary-container">query_stats</span>
                 <div>
                   <h2 className="font-display text-sm font-black uppercase tracking-[0.2em] text-on-surface">
                     Up next
@@ -184,9 +152,7 @@ export default async function DashboardPage() {
             </div>
             <div className="p-6">
               {tournaments.length === 0 ? (
-                <p className="text-sm text-on-surface-variant">
-                  Join a circle to get quick vote prompts.
-                </p>
+                <p className="text-sm text-on-surface-variant">Join a circle to get quick vote prompts.</p>
               ) : (
                 <div className="grid grid-cols-1 gap-3">
                   {tournaments
@@ -202,9 +168,7 @@ export default async function DashboardPage() {
                         >
                           <div className="flex h-14 items-center justify-between border border-zinc-800/50 px-4">
                             <span className="font-headline text-xs font-bold uppercase tracking-tight text-zinc-300 transition-colors group-hover:text-primary">
-                              {m.team1}{" "}
-                              <span className="text-zinc-600">vs</span>{" "}
-                              {m.team2}
+                              {m.team1} <span className="text-zinc-600">vs</span> {m.team2}
                             </span>
                             <span className="rounded bg-zinc-950 px-2 py-0.5 font-headline text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                               {m.status}
@@ -223,9 +187,7 @@ export default async function DashboardPage() {
           <div className="flex h-full min-h-[280px] flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 lg:sticky lg:top-28">
             <div className="flex items-center justify-between border-b border-zinc-800 p-5">
               <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-primary-container">
-                  group
-                </span>
+                <span className="material-symbols-outlined text-primary-container">group</span>
                 <h2 className="font-display text-sm font-black uppercase tracking-[0.2em] text-on-surface">
                   Group Activity
                 </h2>
@@ -259,24 +221,15 @@ export default async function DashboardPage() {
             </div>
           ) : (
             tournaments.map((t, idx) => (
-              <DashboardCircleCard
-                key={t.id}
-                href={`/tournaments/${t.id}`}
-                name={t.name}
-                index={idx}
-              />
+              <DashboardCircleCard key={t.id} href={`/tournaments/${t.id}`} name={t.name} index={idx} />
             ))
           )}
           <Link
             href="/tournaments/create"
             className="flex aspect-[4/5] w-36 shrink-0 flex-col items-center justify-center rounded-xl border border-dashed border-zinc-700 bg-transparent"
           >
-            <span className="material-symbols-outlined mb-1 text-3xl text-zinc-600">
-              add_circle
-            </span>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-              Create New
-            </p>
+            <span className="material-symbols-outlined mb-1 text-3xl text-zinc-600">add_circle</span>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Create New</p>
           </Link>
         </div>
       </section>

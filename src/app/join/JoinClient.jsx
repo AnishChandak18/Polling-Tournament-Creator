@@ -36,10 +36,7 @@ export default function JoinClient({
       const { tournamentId } = payload;
       const target = `/tournaments/${tournamentId}`;
       if (needsOnboarding) {
-        await navigateSpa(
-          router,
-          `/onboarding?next=${encodeURIComponent(target)}`,
-        );
+        await navigateSpa(router, `/onboarding?next=${encodeURIComponent(target)}`);
       } else {
         await navigateSpa(router, target);
       }

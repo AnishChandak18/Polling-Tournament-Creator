@@ -2,11 +2,7 @@
 
 import Link from "next/link";
 
-export default function BrandLogo({
-  href = "/dashboard",
-  className = "",
-  compact = false,
-}) {
+export default function BrandLogo({ href = "/dashboard", className = "", compact = false }) {
   const content = (
     <div className={["inline-flex items-center gap-3", className].join(" ")}>
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-primary-container">

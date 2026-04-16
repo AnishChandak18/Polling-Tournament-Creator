@@ -38,9 +38,7 @@ export default function ResetPasswordClient() {
     setError(null);
     try {
       const supabase = createSupabaseBrowserClient();
-      const { error: updateError } = await supabase.auth.updateUser({
-        password,
-      });
+      const { error: updateError } = await supabase.auth.updateUser({ password });
       if (updateError) {
         setError(updateError.message);
         return;
@@ -66,22 +64,14 @@ export default function ResetPasswordClient() {
     return (
       <AuthStitchLayout>
         <div className="w-full max-w-md border border-outline-variant bg-surface-container p-8 text-center shadow-xl">
-          <p className="font-display text-lg font-bold uppercase text-on-surface">
-            Link invalid or expired
-          </p>
+          <p className="font-display text-lg font-bold uppercase text-on-surface">Link invalid or expired</p>
           <p className="mt-2 text-sm text-on-surface-variant">
             Request a new reset link from the forgot password page.
           </p>
-          <Link
-            href="/forgot-password"
-            className="btn-primary mt-6 inline-flex w-full justify-center py-3 text-sm"
-          >
+          <Link href="/forgot-password" className="btn-primary mt-6 inline-flex w-full justify-center py-3 text-sm">
             Forgot password
           </Link>
-          <Link
-            href="/login"
-            className="btn-outline mt-3 inline-flex w-full justify-center py-3 text-sm"
-          >
+          <Link href="/login" className="btn-outline mt-3 inline-flex w-full justify-center py-3 text-sm">
             Back to login
           </Link>
         </div>
@@ -93,22 +83,12 @@ export default function ResetPasswordClient() {
     return (
       <AuthStitchLayout>
         <div className="w-full max-w-md border border-primary/30 bg-primary-container/10 p-8 text-center">
-          <span
-            className="material-symbols-outlined text-4xl text-primary"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
+          <span className="material-symbols-outlined text-4xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
             verified_user
           </span>
-          <p className="mt-4 font-display text-sm font-bold uppercase tracking-widest text-primary">
-            Key updated
-          </p>
-          <p className="mt-2 text-sm text-on-surface-variant">
-            Sign in with your new password.
-          </p>
-          <Link
-            href="/login"
-            className="btn-primary mt-6 inline-flex w-full justify-center py-3 text-sm"
-          >
+          <p className="mt-4 font-display text-sm font-bold uppercase tracking-widest text-primary">Key updated</p>
+          <p className="mt-2 text-sm text-on-surface-variant">Sign in with your new password.</p>
+          <Link href="/login" className="btn-primary mt-6 inline-flex w-full justify-center py-3 text-sm">
             Go to login
           </Link>
         </div>
@@ -141,24 +121,18 @@ export default function ResetPasswordClient() {
               Reset <span className="italic text-primary">Encryption Key</span>
             </h1>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-on-surface-variant">
-              Choose a new password for your account. Use at least 12 characters
-              with a mix of letters and numbers.
+              Choose a new password for your account. Use at least 12 characters with a mix of letters and numbers.
             </p>
           </div>
 
           <form className="space-y-6" onSubmit={onSubmit}>
             <div className="space-y-2">
-              <label
-                className="ml-1 text-[10px] font-bold uppercase tracking-widest text-primary"
-                htmlFor="new-pw"
-              >
+              <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-primary" htmlFor="new-pw">
                 New encryption key
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                  <span className="material-symbols-outlined text-lg text-on-surface-variant">
-                    vpn_key
-                  </span>
+                  <span className="material-symbols-outlined text-lg text-on-surface-variant">vpn_key</span>
                 </div>
                 <Input
                   id="new-pw"
@@ -173,17 +147,12 @@ export default function ResetPasswordClient() {
             </div>
 
             <div className="space-y-2">
-              <label
-                className="ml-1 text-[10px] font-bold uppercase tracking-widest text-primary"
-                htmlFor="confirm-pw"
-              >
+              <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-primary" htmlFor="confirm-pw">
                 Confirm encryption key
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                  <span className="material-symbols-outlined text-lg text-on-surface-variant">
-                    lock_reset
-                  </span>
+                  <span className="material-symbols-outlined text-lg text-on-surface-variant">lock_reset</span>
                 </div>
                 <Input
                   id="confirm-pw"
@@ -199,10 +168,7 @@ export default function ResetPasswordClient() {
 
             <div className="grid grid-cols-2 gap-4 py-4">
               <div className="flex items-center gap-2 border-l-2 border-primary bg-surface-container-high p-3">
-                <span
-                  className="material-symbols-outlined text-sm text-primary"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
+                <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
                   check_circle
                 </span>
                 <span className="font-display text-[10px] font-bold uppercase tracking-tighter text-on-surface">
@@ -210,10 +176,7 @@ export default function ResetPasswordClient() {
                 </span>
               </div>
               <div className="flex items-center gap-2 border-l-2 border-primary bg-surface-container-high p-3">
-                <span
-                  className="material-symbols-outlined text-sm text-primary"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
+                <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
                   check_circle
                 </span>
                 <span className="font-display text-[10px] font-bold uppercase tracking-tighter text-on-surface">
@@ -234,20 +197,14 @@ export default function ResetPasswordClient() {
 
           <div className="mt-8 flex items-start gap-4 border border-primary/20 bg-primary-container/10 p-4">
             <div className="rounded-full bg-primary/20 p-2">
-              <span
-                className="material-symbols-outlined text-xl text-primary"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
+              <span className="material-symbols-outlined text-xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
                 verified_user
               </span>
             </div>
             <div>
-              <p className="mb-1 text-xs font-bold uppercase tracking-widest text-primary">
-                Status: Ready to sync
-              </p>
+              <p className="mb-1 text-xs font-bold uppercase tracking-widest text-primary">Status: Ready to sync</p>
               <p className="text-xs text-on-surface-variant">
-                After updating, you will be signed out and must log in with the
-                new password.
+                After updating, you will be signed out and must log in with the new password.
               </p>
             </div>
           </div>

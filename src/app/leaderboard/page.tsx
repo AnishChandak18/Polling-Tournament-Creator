@@ -22,12 +22,7 @@ export default async function LeaderboardPage() {
   ]);
 
   return (
-    <PageShell
-      active="leaderboard"
-      maxWidth="max-w-lg"
-      className="px-4"
-      rightSlot={<PointsChip points={totalPoints} />}
-    >
+    <PageShell active="leaderboard" maxWidth="max-w-lg" className="px-4" rightSlot={<PointsChip points={totalPoints} />}>
       <header className="mb-8 text-center">
         <h1 className="font-display text-4xl font-black italic uppercase tracking-tighter text-primary-container">
           Rankings
@@ -40,12 +35,8 @@ export default async function LeaderboardPage() {
 
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-xl text-primary-container">
-            emoji_events
-          </span>
-          <div className="font-display text-sm font-black uppercase tracking-widest text-on-surface">
-            Your circles
-          </div>
+          <span className="material-symbols-outlined text-xl text-primary-container">emoji_events</span>
+          <div className="font-display text-sm font-black uppercase tracking-widest text-on-surface">Your circles</div>
         </div>
         <Link
           href="/tournaments"
@@ -61,20 +52,18 @@ export default async function LeaderboardPage() {
             No circles found.
           </div>
         ) : (
-          tournaments
-            .slice(0, 7)
-            .map((t, idx) => (
-              <CircleCard
-                key={t.id}
-                href={`/tournaments/${t.id}/leaderboard`}
-                name={t.name}
-                season={t.season}
-                status={t.status}
-                variant="ranking"
-                rank={ranks[idx]}
-                isFirst={ranks[idx] === 1}
-              />
-            ))
+          tournaments.slice(0, 7).map((t, idx) => (
+            <CircleCard
+              key={t.id}
+              href={`/tournaments/${t.id}/leaderboard`}
+              name={t.name}
+              season={t.season}
+              status={t.status}
+              variant="ranking"
+              rank={ranks[idx]}
+              isFirst={ranks[idx] === 1}
+            />
+          ))
         )}
       </div>
     </PageShell>

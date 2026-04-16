@@ -17,11 +17,8 @@ function outcomeForVote(row: {
   winnerTeam: string | null;
   matchStatus: string;
 }) {
-  if (row.matchStatus !== "COMPLETED" || !row.winnerTeam)
-    return "pending" as const;
-  return row.winnerTeam === row.teamVoted
-    ? ("win" as const)
-    : ("loss" as const);
+  if (row.matchStatus !== "COMPLETED" || !row.winnerTeam) return "pending" as const;
+  return row.winnerTeam === row.teamVoted ? ("win" as const) : ("loss" as const);
 }
 
 export default async function ProfilePage() {
@@ -29,20 +26,16 @@ export default async function ProfilePage() {
   if (!supabaseUser) redirect("/login");
   if (!dbUser) redirect("/login?error=database");
 
-  const [predictionCount, bestRank, totalPoints, winStats, recentVotes] =
-    await Promise.all([
-      getUserPredictionCount(dbUser.id),
-      getUserBestRankInCircles(dbUser.id),
-      getUserPointsChipTotal(dbUser.id),
-      getUserWinRateStats(dbUser.id),
-      getRecentVotesForUser(dbUser.id, 3),
-    ]);
+  const [predictionCount, bestRank, totalPoints, winStats, recentVotes] = await Promise.all([
+    getUserPredictionCount(dbUser.id),
+    getUserBestRankInCircles(dbUser.id),
+    getUserPointsChipTotal(dbUser.id),
+    getUserWinRateStats(dbUser.id),
+    getRecentVotesForUser(dbUser.id, 3),
+  ]);
 
-  const handle = dbUser.username
-    ? `@${dbUser.username}`
-    : dbUser.name || "Player";
-  const winRateLabel =
-    winStats.winRate != null ? winStats.winRate.toFixed(1) : "—";
+  const handle = dbUser.username ? `@${dbUser.username}` : dbUser.name || "Player";
+  const winRateLabel = winStats.winRate != null ? winStats.winRate.toFixed(1) : "—";
   const rankLabel = bestRank != null ? `#${bestRank}` : "—";
   const milestoneCap = 10000;
   const xpPct = Math.min(100, Math.round((totalPoints / milestoneCap) * 100));
@@ -119,13 +112,9 @@ export default async function ProfilePage() {
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-2">
-                <h2 className="font-display text-2xl font-bold text-on-surface">
-                  {handle}
-                </h2>
+                <h2 className="font-display text-2xl font-bold text-on-surface">{handle}</h2>
                 <Link href="/settings" className="text-on-surface-variant">
-                  <span className="material-symbols-outlined text-base">
-                    edit
-                  </span>
+                  <span className="material-symbols-outlined text-base">edit</span>
                 </Link>
               </div>
               <div className="mt-1 flex items-center justify-center gap-2">
@@ -133,26 +122,18 @@ export default async function ProfilePage() {
                   Elite Strategist
                 </span>
               </div>
-              <p className="mt-2 text-xs font-bold uppercase tracking-widest text-outline">
-                {supabaseUser.email}
-              </p>
+              <p className="mt-2 text-xs font-bold uppercase tracking-widest text-outline">{supabaseUser.email}</p>
             </div>
           </div>
         </section>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col justify-between rounded-lg border-t border-zinc-800 bg-surface-container-high p-4">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-              Win Rate
-            </span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Win Rate</span>
             <div className="mt-2 flex items-baseline gap-1">
-              <span className="font-display text-3xl font-black text-primary">
-                {winRateLabel}
-              </span>
+              <span className="font-display text-3xl font-black text-primary">{winRateLabel}</span>
               {winStats.winRate != null ? (
-                <span className="text-sm font-bold text-primary-container">
-                  %
-                </span>
+                <span className="text-sm font-bold text-primary-container">%</span>
               ) : null}
             </div>
           </div>
@@ -165,32 +146,19 @@ export default async function ProfilePage() {
             </span>
           </div>
           <div className="flex flex-col justify-between rounded-lg border-t border-zinc-800 bg-surface-container-high p-4">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-              Best rank
-            </span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Best rank</span>
             <div className="mt-2 flex items-center gap-2">
-              <span className="font-display text-3xl font-black text-[#e3d845]">
-                {rankLabel}
-              </span>
-              <span
-                className="material-symbols-outlined text-[#e3d845]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
+              <span className="font-display text-3xl font-black text-[#e3d845]">{rankLabel}</span>
+              <span className="material-symbols-outlined text-[#e3d845]" style={{ fontVariationSettings: "'FILL' 1" }}>
                 local_fire_department
               </span>
             </div>
           </div>
           <div className="flex flex-col justify-between rounded-lg border-t border-zinc-800 bg-surface-container-high p-4">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-              Current Streak
-            </span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Current Streak</span>
             <div className="mt-2 flex items-center gap-2">
-              <span className="font-display text-3xl font-black text-tertiary">
-                —
-              </span>
-              <span className="material-symbols-outlined text-tertiary">
-                trending_up
-              </span>
+              <span className="font-display text-3xl font-black text-tertiary">—</span>
+              <span className="material-symbols-outlined text-tertiary">trending_up</span>
             </div>
           </div>
         </div>
@@ -206,8 +174,7 @@ export default async function ProfilePage() {
               </p>
             </div>
             <span className="text-xs font-bold text-primary">
-              {totalPoints.toLocaleString()} / {milestoneCap.toLocaleString()}{" "}
-              XP
+              {totalPoints.toLocaleString()} / {milestoneCap.toLocaleString()} XP
             </span>
           </div>
           <div className="h-3 w-full overflow-hidden rounded-full border border-zinc-800 bg-surface-container-lowest">
@@ -217,28 +184,20 @@ export default async function ProfilePage() {
             />
           </div>
           <p className="text-[10px] italic text-on-surface-variant">
-            Next milestone: higher leaderboard tiers and bonus points in your
-            circles.
+            Next milestone: higher leaderboard tiers and bonus points in your circles.
           </p>
         </section>
 
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-on-surface-variant">
-              Recent Predictions
-            </h3>
-            <Link
-              href="/predictions"
-              className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline"
-            >
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-on-surface-variant">Recent Predictions</h3>
+            <Link href="/predictions" className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline">
               View History
             </Link>
           </div>
           <div className="space-y-3">
             {recentVotes.length === 0 ? (
-              <p className="text-sm text-on-surface-variant">
-                No predictions yet.
-              </p>
+              <p className="text-sm text-on-surface-variant">No predictions yet.</p>
             ) : (
               recentVotes.map((v) => {
                 const o = outcomeForVote(v);
@@ -254,11 +213,7 @@ export default async function ProfilePage() {
                   <div
                     key={v.id}
                     className={`flex items-center justify-between rounded-lg border-l-2 bg-surface-container-low p-4 transition-colors hover:bg-surface-container ${
-                      isWin
-                        ? "border-primary-container"
-                        : isLoss
-                          ? "border-error-dim"
-                          : "border-zinc-700"
+                      isWin ? "border-primary-container" : isLoss ? "border-error-dim" : "border-zinc-700"
                     }`}
                   >
                     <div className="flex min-w-0 items-center gap-4">
@@ -272,9 +227,7 @@ export default async function ProfilePage() {
                         </span>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold tracking-tight text-on-surface">
-                          {title}
-                        </p>
+                        <p className="text-sm font-bold tracking-tight text-on-surface">{title}</p>
                         <p className="text-[10px] font-medium text-on-surface-variant">
                           {date} • {v.tournamentName}
                         </p>
@@ -289,16 +242,12 @@ export default async function ProfilePage() {
                         <>
                           <span
                             className={`inline-block rounded-sm px-2 py-0.5 text-[10px] font-black uppercase tracking-tighter ${
-                              isWin
-                                ? "bg-primary-container text-on-primary-container"
-                                : "bg-error-container text-on-error-container"
+                              isWin ? "bg-primary-container text-on-primary-container" : "bg-error-container text-on-error-container"
                             }`}
                           >
                             {isWin ? "WIN" : "LOSS"}
                           </span>
-                          <p
-                            className={`mt-1 text-xs font-bold ${isWin ? "text-primary-container" : "text-error-dim"}`}
-                          >
+                          <p className={`mt-1 text-xs font-bold ${isWin ? "text-primary-container" : "text-error-dim"}`}>
                             {isWin ? "+PTS" : "—"}
                           </p>
                         </>

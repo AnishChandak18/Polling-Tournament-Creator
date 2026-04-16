@@ -28,14 +28,13 @@ export default async function TournamentDetailPage({
 
   const { id: tournamentId } = await params;
 
-  const [tournament, totalPoints, memberCount, leaderboardData, userRank] =
-    await Promise.all([
-      getTournamentWithMatchesForUser(tournamentId, dbUser.id),
-      getUserPointsChipTotal(dbUser.id),
-      getTournamentMemberCount(tournamentId),
-      getTournamentLeaderboardForUser(tournamentId, dbUser.id),
-      getUserRankInTournament(dbUser.id, tournamentId),
-    ]);
+  const [tournament, totalPoints, memberCount, leaderboardData, userRank] = await Promise.all([
+    getTournamentWithMatchesForUser(tournamentId, dbUser.id),
+    getUserPointsChipTotal(dbUser.id),
+    getTournamentMemberCount(tournamentId),
+    getTournamentLeaderboardForUser(tournamentId, dbUser.id),
+    getUserRankInTournament(dbUser.id, tournamentId),
+  ]);
 
   if (!tournament) redirect("/tournaments");
 
@@ -45,20 +44,14 @@ export default async function TournamentDetailPage({
 
   const isOwner = tournament.ownerId === dbUser.id;
 
-  const leaderboardTop = (leaderboardData?.leaderboard ?? [])
-    .slice(0, 3)
-    .map((row, i) => ({
-      rank: i + 1,
-      displayName:
-        row.user.name?.trim() || row.user.email?.split("@")[0] || "Player",
-      score: row.score,
-      avatarUrl: row.user.avatarUrl,
-    }));
+  const leaderboardTop = (leaderboardData?.leaderboard ?? []).slice(0, 3).map((row, i) => ({
+    rank: i + 1,
+    displayName: row.user.name?.trim() || row.user.email?.split("@")[0] || "Player",
+    score: row.score,
+    avatarUrl: row.user.avatarUrl,
+  }));
 
-  const circleIdLabel = `#${tournament.id
-    .replace(/[^a-z0-9]/gi, "")
-    .slice(0, 8)
-    .toUpperCase()}`;
+  const circleIdLabel = `#${tournament.id.replace(/[^a-z0-9]/gi, "").slice(0, 8).toUpperCase()}`;
   const liveMatch = tournament.matches.find((m) => m.status === "LIVE");
 
   return (
@@ -71,10 +64,7 @@ export default async function TournamentDetailPage({
 
       <main className="mx-auto max-w-5xl px-4 pb-24 pt-20 kinetic-grid">
         <section className="relative mb-8">
-          <div
-            className="absolute -left-4 top-0 h-16 w-1 bg-primary"
-            aria-hidden
-          />
+          <div className="absolute -left-4 top-0 h-16 w-1 bg-primary" aria-hidden />
           <div className="pl-4">
             <div className="mb-1 flex items-center gap-2">
               <span className="border border-primary/20 bg-primary/10 px-2 py-0.5 font-headline text-[10px] font-bold uppercase tracking-widest text-primary">
@@ -138,11 +128,7 @@ export default async function TournamentDetailPage({
           )}
         </div>
 
-        <CircleArenaLeaderboard
-          tournamentId={tournament.id}
-          userRank={userRank}
-          rows={leaderboardTop}
-        />
+        <CircleArenaLeaderboard tournamentId={tournament.id} userRank={userRank} rows={leaderboardTop} />
 
         <CircleArenaInvite tournamentId={tournament.id} isOwner={isOwner} />
       </main>

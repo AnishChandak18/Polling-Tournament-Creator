@@ -84,9 +84,7 @@ export default function LoginClient() {
           <h1 className="font-display text-4xl font-bold uppercase tracking-tighter text-on-surface">
             Welcome Back
           </h1>
-          <p className="mt-1 text-sm font-medium text-zinc-500">
-            Sign in to your account
-          </p>
+          <p className="mt-1 text-sm font-medium text-zinc-500">Sign in to your account</p>
         </StadiumSectionLabel>
 
         <StadiumGlowPanel className="mt-8">
@@ -150,12 +148,8 @@ export default function LoginClient() {
               disabled={pwdLoading}
               className="group flex w-full items-center justify-center gap-2 bg-primary-container py-4 font-display text-on-primary-container transition-transform duration-100 active:scale-95 disabled:opacity-60"
             >
-              <span className="font-black uppercase tracking-[0.15em]">
-                {pwdLoading ? "Signing in..." : "Sign In"}
-              </span>
-              <span className="material-symbols-outlined text-xl transition-transform group-hover:translate-x-1">
-                login
-              </span>
+              <span className="font-black uppercase tracking-[0.15em]">{pwdLoading ? "Signing in..." : "Sign In"}</span>
+              <span className="material-symbols-outlined text-xl transition-transform group-hover:translate-x-1">login</span>
             </button>
 
             <div className="relative flex items-center py-2">
@@ -181,11 +175,7 @@ export default function LoginClient() {
             <p className="text-xs font-medium text-zinc-500">
               New operator?{" "}
               <Link
-                href={
-                  next === "/dashboard"
-                    ? "/signup"
-                    : `/signup?next=${encodeURIComponent(next)}`
-                }
+                href={next === "/dashboard" ? "/signup" : `/signup?next=${encodeURIComponent(next)}`}
                 className="ml-1 font-bold text-primary-container hover:underline"
               >
                 Create an Account
@@ -196,27 +186,17 @@ export default function LoginClient() {
 
         <div className="mt-8 grid grid-cols-2 gap-4">
           <div className="border-l-2 border-primary-container bg-zinc-900/40 p-3">
-            <p className="mb-1 font-display text-[8px] uppercase tracking-widest text-zinc-500">
-              Session Integrity
-            </p>
+            <p className="mb-1 font-display text-[8px] uppercase tracking-widest text-zinc-500">Session Integrity</p>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-              <span className="font-display text-[10px] font-bold text-zinc-300">
-                SECURE_LINK_ACTIVE
-              </span>
+              <span className="font-display text-[10px] font-bold text-zinc-300">SECURE_LINK_ACTIVE</span>
             </div>
           </div>
           <div className="border-l-2 border-zinc-700 bg-zinc-900/40 p-3">
-            <p className="mb-1 font-display text-[8px] uppercase tracking-widest text-zinc-500">
-              Verification
-            </p>
+            <p className="mb-1 font-display text-[8px] uppercase tracking-widest text-zinc-500">Verification</p>
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[14px] text-zinc-400">
-                shield
-              </span>
-              <span className="font-display text-[10px] font-bold text-zinc-300">
-                MFA_READY
-              </span>
+              <span className="material-symbols-outlined text-[14px] text-zinc-400">shield</span>
+              <span className="font-display text-[10px] font-bold text-zinc-300">MFA_READY</span>
             </div>
           </div>
         </div>

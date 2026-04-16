@@ -8,9 +8,7 @@ export default function StadiumGlowPanel({ children, className = "" }) {
       ].join(" ")}
     >
       <div className="pointer-events-none absolute right-0 top-0 p-2 opacity-20">
-        <span className="material-symbols-outlined text-4xl text-primary">
-          grid_view
-        </span>
+        <span className="material-symbols-outlined text-4xl text-primary">grid_view</span>
       </div>
       <div className="relative z-10">{children}</div>
     </div>

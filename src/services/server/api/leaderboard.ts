@@ -5,26 +5,25 @@ import { HttpError } from "@/services/server/api/errors";
 export async function getLeaderboardForCurrentUser(tournamentId: string) {
   const user = await getCurrentUserOrThrow();
 
-  const tournament = await prisma.tournament.findFirst({
+  const allowed = await prisma.tournament.findFirst({
     where: {
       id: tournamentId,
       OR: [{ ownerId: user.id }, { members: { some: { userId: user.id } } }],
     },
-    select: {
-      id: true,
-      members: {
-        orderBy: [{ score: "desc" }, { createdAt: "asc" }],
-        select: {
-          userId: true,
-          score: true,
-          user: { select: { name: true, email: true, avatarUrl: true } },
-        },
-      },
-    },
+    select: { id: true },
   });
-  if (!tournament) {
+  if (!allowed) {
     throw new HttpError("Not found", 404);
   }
 
-  return { leaderboard: tournament.members };
+  const leaderboard = await prisma.tournamentMember.findMany({
+    where: { tournamentId },
+    orderBy: [{ score: "desc" }, { createdAt: "asc" }],
+    select: {
+      score: true,
+      user: { select: { name: true, email: true, avatarUrl: true } },
+    },
+  });
+
+  return { leaderboard };
 }

@@ -36,12 +36,9 @@ export default function ForgotPasswordClient() {
     try {
       setAuthRedirectCookie("/reset-password");
       const supabase = createSupabaseBrowserClient();
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-        trimmed,
-        {
-          redirectTo: getAuthCallbackUrl(),
-        },
-      );
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmed, {
+        redirectTo: getAuthCallbackUrl(),
+      });
       if (resetError) {
         setError(resetError.message);
         return;
@@ -59,16 +56,13 @@ export default function ForgotPasswordClient() {
       <div className="relative z-10 w-full max-w-md">
         <div className="mb-10 flex flex-col items-center text-center">
           <div className="mb-6 flex h-16 w-16 rotate-45 items-center justify-center border border-primary-container/30 bg-surface-container-highest shadow-[0_0_30px_rgba(255,231,146,0.1)]">
-            <span className="material-symbols-outlined -rotate-45 text-4xl text-primary">
-              lock_reset
-            </span>
+            <span className="material-symbols-outlined -rotate-45 text-4xl text-primary">lock_reset</span>
           </div>
           <h2 className="font-display text-3xl font-bold uppercase tracking-tighter text-on-surface">
             Access Recovery
           </h2>
           <p className="mt-2 max-w-[280px] text-sm text-on-surface-variant">
-            Initiate an encrypted recovery sequence to reclaim your tactical
-            account.
+            Initiate an encrypted recovery sequence to reclaim your tactical account.
           </p>
         </div>
 
@@ -78,18 +72,12 @@ export default function ForgotPasswordClient() {
 
           {sent ? (
             <div className="space-y-4 text-center text-sm text-on-surface">
-              <p className="font-display font-bold uppercase tracking-widest text-primary">
-                Check your email
-              </p>
+              <p className="font-display font-bold uppercase tracking-widest text-primary">Check your email</p>
               <p className="text-on-surface-variant">
-                If an account exists for{" "}
-                <span className="font-medium text-on-surface">{email}</span>,
-                you will receive a reset link shortly.
+                If an account exists for <span className="font-medium text-on-surface">{email}</span>, you will receive a
+                reset link shortly.
               </p>
-              <Link
-                href="/login"
-                className="btn-outline inline-flex w-full justify-center py-3 text-sm"
-              >
+              <Link href="/login" className="btn-outline inline-flex w-full justify-center py-3 text-sm">
                 Return to login
               </Link>
             </div>
@@ -104,9 +92,7 @@ export default function ForgotPasswordClient() {
                 </label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <span className="material-symbols-outlined text-sm text-outline">
-                      alternate_email
-                    </span>
+                    <span className="material-symbols-outlined text-sm text-outline">alternate_email</span>
                   </div>
                   <Input
                     id="forgot-email"
@@ -140,24 +126,18 @@ export default function ForgotPasswordClient() {
               href="/login"
               className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-500 transition-colors hover:text-primary-container"
             >
-              <span className="material-symbols-outlined text-lg">
-                arrow_back
-              </span>
+              <span className="material-symbols-outlined text-lg">arrow_back</span>
               Return to login
             </Link>
           </div>
         </div>
 
         <div className="mt-8 flex items-start gap-4 border-l border-primary-container/20 bg-primary-container/5 p-4">
-          <span
-            className="material-symbols-outlined shrink-0 text-xl text-primary"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
+          <span className="material-symbols-outlined shrink-0 text-xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
             security
           </span>
           <p className="text-[11px] leading-relaxed text-on-surface-variant">
-            Reset links expire after a limited time. Use a strong password when
-            you set a new encryption key.
+            Reset links expire after a limited time. Use a strong password when you set a new encryption key.
           </p>
         </div>
 
