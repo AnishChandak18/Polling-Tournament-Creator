@@ -8,11 +8,6 @@ export {
   getLiveArenaTargetForUser,
 } from "@/services/server/tournaments";
 export {
-  syncFixturesForUserTournaments,
-  scheduleFixtureSyncForUser,
-  userNeedsFixtureSync,
-} from "@/services/server/fixture-sync";
-export {
   getUserPointsChipTotal,
   getUserBestRankInCircles,
   getUserPredictionCount,

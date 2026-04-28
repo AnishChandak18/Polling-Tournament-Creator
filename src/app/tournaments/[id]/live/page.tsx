@@ -1,8 +1,23 @@
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import LiveArenaTopBar from "@/components/live-arena/LiveArenaTopBar";
-import LiveArenaClient from "@/components/live-arena/LiveArenaClient";
 import CircleArenaBottomNav from "@/components/circle-arena/CircleArenaBottomNav";
+
+const LiveArenaClient = dynamic(
+  () => import("@/components/live-arena/LiveArenaClient"),
+  {
+    loading: () => (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 px-4">
+        <div className="h-10 w-10 animate-pulse rounded-full bg-primary/20" aria-hidden />
+        <p className="font-headline text-xs uppercase tracking-widest text-on-surface-variant">
+          Loading live match…
+        </p>
+        <span className="sr-only">Loading live arena</span>
+      </div>
+    ),
+  }
+);
 import { getAuthContext, getTournamentWithMatchesForUser, getUserPointsChipTotal } from "@/services/server";
 
 export default async function TournamentLiveArenaPage({

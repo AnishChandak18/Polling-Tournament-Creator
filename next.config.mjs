@@ -1,3 +1,9 @@
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Use the generated client from node_modules; bundling Prisma with Turbopack can serve a stale datamodel (e.g. missing Json fields like displayMeta).
@@ -11,6 +17,8 @@ const nextConfig = {
       dynamic: 300,
       static: 600,
     },
+    /** Tree-shake barrel imports for large packages (add more if bundle analyzer shows heavy modules). */
+    optimizePackageImports: ["@supabase/supabase-js"],
   },
   async headers() {
     return [
@@ -27,4 +35,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

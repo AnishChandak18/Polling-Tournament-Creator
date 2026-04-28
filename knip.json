@@ -1,0 +1,22 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/app/**/page.{tsx,jsx}",
+    "src/app/**/layout.{tsx,jsx}",
+    "src/app/**/route.ts",
+    "src/app/**/loading.{tsx,jsx}",
+    "src/app/**/error.{tsx,jsx}",
+    "src/app/auth/**/*.ts"
+  ],
+  "project": ["src/**/*.{ts,tsx,js,jsx}"],
+  "ignoreIssues": {
+    "src/lib/**/*.ts": ["exports", "types"],
+    "src/services/api/**/*.ts": ["exports", "types"],
+    "src/services/server/api/**/*.ts": ["exports", "types"],
+    "src/services/server/fixture-sync.ts": ["exports"],
+    "src/services/server/circle-invite.ts": ["exports"],
+    "src/components/ui/button.tsx": ["types"],
+    "src/components/ui/FormField.tsx": ["types"],
+    "src/services/server/activity.ts": ["types"]
+  }
+}

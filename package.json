@@ -10,6 +10,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint .",
+    "analyze": "ANALYZE=true prisma generate && next build --webpack",
+    "knip": "knip",
     "postinstall": "prisma generate",
     "db:migrate": "dotenv -e .env.local -- prisma db push",
     "db:push": "dotenv -e .env.local -- prisma db push",
@@ -26,7 +28,6 @@
     "@supabase/supabase-js": "^2.99.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.577.0",
     "next": "^16.1.7",
     "prisma": "^6.19.2",
     "react": "^18",
@@ -34,16 +35,19 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
-    "dotenv-cli": "^8.0.0",
+    "@next/eslint-plugin-next": "^16.1.7",
+    "@next/bundle-analyzer": "^16.2.4",
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "dotenv-cli": "^8.0.0",
     "eslint": "^9.39.4",
-    "eslint-config-next": "^16.1.7",
+    "knip": "^5.88.1",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "typescript-eslint": "^8.46.0"
   }
 }
